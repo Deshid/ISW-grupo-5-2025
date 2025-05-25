@@ -9,7 +9,7 @@ import { solicitarCancelacionReserva } from "../controllers/reserva.controller.j
 import { getMisReservas } from "../controllers/reserva.controller.js";
 import { actualizarReservaUsuario } from "../controllers/reserva.controller.js";
 import { eliminarReservaUsuario } from "../controllers/reserva.controller.js";
-
+import { getReservasAdmin } from "../controllers/reserva.controller.js";
 const router = Router();
 
 router.post("/", crearReserva);
@@ -20,4 +20,6 @@ router.patch("/:id", authenticateJwt, actualizarReservaUsuario);
 router.delete("/:id", authenticateJwt, eliminarReservaUsuario);
 router.patch("/:id/solicitar-cancelacion", authenticateJwt, solicitarCancelacionReserva);
 router.patch("/:id/cancelar", authenticateJwt, isAdmin, cancelarReserva);
+router.get("/admin/todas", authenticateJwt, isAdmin, getReservasAdmin);
+
 export default router;

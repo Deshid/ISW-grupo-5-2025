@@ -192,26 +192,36 @@ export async function eliminarReservaUsuario(req, res) {
         res.status(500).json({ error: "Error interno del servidor" });
     }
 }
-
+/* Solicita cancelar reserva aprobada (USUARIO) */
 export async function solicitarCancelacionReserva(req, res) {
     try {
-        const { id } = req.params;
+        const id = parseInt(req.params.id, 10);
+        const userId = req.user.id;
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
 
-        const reserva = await reservaRepository.findOne({ where: { id } });
-        if (!reserva) return res.status(404).json({ error: "Reserva no encontrada" });
-
-        // Validar que falte al menos 1 día
-        const hoy = new Date();
-        const fechaReserva = new Date(reserva.fecha);
-        const diferencia = (fechaReserva - hoy) / (1000 * 60 * 60 * 24);
-
-        if (diferencia < 1) {
-        return res.status(400).json({ error: "Solo puedes cancelar con al menos 1 día de anticipación" });
+        // ver que sea del usuario autenticado
+        const reserva = await reservaRepository.findOne({
+            where: { id, usuario: { id: userId } }
+        });
+        if (!reserva) {
+            return res.status(404).json({ error: "Reserva no encontrada o no autorizada" });
         }
-        // Solo si está aprobada o pendiente puede solicitar cancelación
-        if (!["aprobada", "pendiente"].includes(reserva.estado)) {
-            return res.status(400).json({ error: "No se puede solicitar cancelación en este estado" });
+
+        // Validar la cancelación con al menos 1 día de anticipación
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const fechaReserva = new Date(reserva.fecha);
+        fechaReserva.setHours(0, 0, 0, 0);
+
+        const diferenciaDias = (fechaReserva - hoy) / (1000 * 60 * 60 * 24);
+
+        if (diferenciaDias < 1) {
+            return res.status(400).json({ error: "Solo puedes cancelar hasta 1 día antes de la fecha de la reserva" });
+        }
+
+        // Solo si está aprobada puede solicitar cancelación
+        if (reserva.estado !== "aprobada") {
+            return res.status(400).json({ error: "Solo puedes solicitar cancelación de reservas aprobadas" });
         }
 
         reserva.estado = "cancelacion_pendiente";
@@ -219,9 +229,50 @@ export async function solicitarCancelacionReserva(req, res) {
 
         res.status(200).json({ message: "Solicitud para cancelar enviada. Un administrador debe aprobarla.", reserva });
     } catch (error) {
-        res.status(500).json({ error: "Error al solicitar la cancelación" });
+    console.error("Error al solicitar la cancelación:", error);
+    res.status(500).json({ error: "Error al solicitar la cancelación" });
+}
+}
+/* Obtener reservas pendientes (ADMIN) */
+export async function getReservasAdmin(res) {
+    try {
+        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
+        const reservas = await reservaRepository.find({
+            where: [
+                { estado: "pendiente" },
+                { estado: "cancelacion_pendiente" }
+            ],
+            relations: ["usuario", "espacioComun"],
+            order: { fecha: "ASC", horaInicio: "ASC" }
+        });
+
+        const resultado = reservas.map(reserva => ({
+            id: reserva.id,
+            estado: reserva.estado,
+            fecha: reserva.fecha,
+            horaInicio: reserva.horaInicio,
+            horaFin: reserva.horaFin,
+            usuario: {
+                id: reserva.usuario.id,
+                nombreCompleto: reserva.usuario.nombreCompleto,
+                email: reserva.usuario.email,
+                rut: reserva.usuario.rut,
+                rol: reserva.usuario.rol
+            },
+            espacioComun: {
+                id_espacio: reserva.espacioComun.id_espacio,
+                nombre: reserva.espacioComun.nombre,
+                descripcion: reserva.espacioComun.descripcion
+            }
+        }));
+
+        res.status(200).json(resultado);
+    } catch (error) {
+        console.error("Error al obtener reservas para admin:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
     }
 }
+
 /* Eliminar reserva cancelada */
 export async function cancelarReserva(req, res) {
     try {
@@ -234,6 +285,9 @@ export async function cancelarReserva(req, res) {
         if (reserva.estado !== "cancelacion_pendiente") {
             return res.status(400).json({ error: "La reserva no está en estado de cancelación pendiente" });
         }
+        reserva.estado = "cancelada";
+        await reservaRepository.save(reserva);
+
     res.status(200).json({ message: "Reserva cancelada por el administrador", reserva });
     } catch (error) {
         res.status(500).json({ error: "Error al cancelar reserva" });

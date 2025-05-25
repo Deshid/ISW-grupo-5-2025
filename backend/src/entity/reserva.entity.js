@@ -54,7 +54,7 @@ import  UserSchema  from "./user.entity.js";
         },
         estado: {
         type: "varchar",
-        length: 20,
+        length: 30,
         default: "pendiente"
     },
     },
