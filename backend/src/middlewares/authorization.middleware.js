@@ -4,6 +4,7 @@ import {
 handleErrorClient,
 handleErrorServer,
 } from "../handlers/responseHandlers.js";
+
 export function authorizeRoles(...rolesPermitidos) {
     return async (req, res, next) => {
     try {
