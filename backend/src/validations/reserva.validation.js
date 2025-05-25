@@ -23,7 +23,7 @@
             "any.required": "El id_espacio es obligatorio."
         }),
     fecha: Joi.string()
-        .pattern(/^\d{4}-\d{2}-\d{2}$/)
+        .isoDate()
         .required()
         .messages({
         "string.pattern.base": "La fecha debe ser válida (YYYY-MM-DD).",
