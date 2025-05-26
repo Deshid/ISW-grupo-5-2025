@@ -11,14 +11,17 @@ import {
 
 const router = Router();
 
-router
-  .use(authenticateJwt)
-  .use(authorizeRoles("administrador", "usuario", "presidente", "tesorero", "secretario"));
+router.get("/", authenticateJwt, authorizeRoles("administrador", "presidente"), getUsers);
 
-router
-  .get("/", getUsers)
-  .get("/detail/", getUser)
-  .patch("/detail/", updateUser)
-  .delete("/detail/", deleteUser);
+router.get("/detail/", authenticateJwt, authorizeRoles("administrador", 
+  "usuario", 
+  "presidente",
+  "tesorero",
+  "secretario")
+                , getUser);
+
+router.patch("/detail/", authenticateJwt, authorizeRoles("administrador"), updateUser);
+
+router.delete("/detail/", authenticateJwt, authorizeRoles("administrador", "secretario"), deleteUser);
 
 export default router;

@@ -22,21 +22,21 @@ export function authorizeRoles(...rolesPermitidos) {
 
         const rolUser = userFound.rol;
 
-        if (rolUser !== "administrador") {
+        if (!rolesPermitidos.includes(rolUser)) {
             return handleErrorClient(
                 res,
                 403,
                 "Error al acceder al recurso",
-                "Se requiere un rol de administrador para realizar esta acción."
+                `Se requiere uno de los siguientes roles: ${rolesPermitidos.join(", ")}`
             );
         }
-        next();
+                next();
     } catch (error) {
         handleErrorServer(
-        res,
-        500,
-        error.message,
-        );
-    }
+            res,
+            500,
+            error.message,
+            );
+        }
     }
 }
