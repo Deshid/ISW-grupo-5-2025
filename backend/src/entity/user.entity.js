@@ -32,6 +32,14 @@ const UserSchema = new EntitySchema({
       length: 50,
       nullable: false,
     },
+    departamento:{
+      type: "varchar",
+      nullable: true, //momentaneo mientras resuelvo el bug
+    },
+    whatsapp:{
+      type: "int",
+      nullable: true,
+    },
     password: {
       type: "varchar",
       nullable: false,
