@@ -1,295 +1,127 @@
-import { AppDataSource } from "../config/configDb.js";
-import { ReservaSchema } from "../entity/reserva.entity.js";
-import { reservarEspacio } from "../services/reserva.service.js";
+"use strict";
+import {
+    actualizarEstadoReservaServicio,
+    actualizarReservaServicio,
+    cancelarReservaServicio,
+    eliminarReservaUsuarioServicio,
+    getMisReservasServicio,
+    getReservasAdminServicio,
+    getReservasServicio,
+    reservarEspacioServicio,
+    solicitarCancelacionReservaServicio
+} from "../services/reserva.service.js";
 import { reservaValidation } from "../validations/reserva.validation.js";
 
+
+// Crear reserva
     export async function crearReserva(req, res) {
-    const { error, value } = reservaValidation.validate(req.body);
-    if (error) {
-        return res.status(400).json({ error: error.details[0].message });
+    try {
+        const { error, value } = reservaValidation.validate(req.body);
+        if (error) return res.status(400).json({ error: error.details[0].message });
+        value.id = req.user.id;
+        const [reserva, err] = await reservarEspacioServicio(value);
+        if (err) return res.status(400).json({ error: err });
+        res.status(200).json({
+        message: "Reserva creada exitosamente",
+        status: "Success",
+        reserva
+        });
+    } catch (error) {
+        console.error("Error al reservar espacio común:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
     }
-    value.estado = "pendiente";
-    const [reserva, err] = await reservarEspacio(value);
-    if (err) {
-        return res.status(400).json({ error: err });
-    }
-
-    const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-    const reservaCompleta = await reservaRepository.findOne({
-        where: { id: reserva.id },
-        relations: ["usuario", "espacioComun"],
-    });
-
-    return res.status(201).json({
-        estado: reservaCompleta.estado,
-        fecha: reservaCompleta.fecha,
-        horaInicio: reservaCompleta.horaInicio,
-        horaFin: reservaCompleta.horaFin,
-        usuario: {
-            id: reservaCompleta.usuario.id,
-            nombre: reservaCompleta.usuario.nombreCompleto,
-            email: reservaCompleta.usuario.email,
-        },
-        espacioComun: {
-            id: reservaCompleta.espacioComun.id_espacio,
-            nombre: reservaCompleta.espacioComun.nombre,
-        }
-    });
     }
 
     export async function getReservas(req, res) {
     try {
         const { id_espacio, fecha } = req.query;
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-
-
-        const reservas = await reservaRepository.find({
-        where: {
-            espacioComun: { id_espacio: id_espacio },
-            fecha,
-        },
-        relations: ["espacioComun", "usuario"],
-        });
-
-        // devuelve las reservas encontradas
-        const reservasEncontradas = reservas.map(reserva => ({
-        estado: reserva.estado,
-        horaInicio: reserva.horaInicio,
-        horaFin: reserva.horaFin,
-        espacioComun: reserva.espacioComun.nombre,
-        usuario: reserva.usuario.nombreCompleto,
-        }));
-
+        const [reservasEncontradas, err] = await getReservasServicio({ id_espacio, fecha });
+        if (err) return res.status(400).json({ error: err });
         res.status(200).json(reservasEncontradas);
-    }
-    catch (error) {
+    } catch (error) {
         console.error("Error al obtener reservas:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
     }
-
-export async function getMisReservas(req, res) {
+    // Obtener reservas del usuario autenticado
+    export async function getMisReservas(req, res) {
     try {
-        const userId = req.user.id; 
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-
-        const reservas = await reservaRepository.find({
-            where: { usuario: { id: userId } },
-            relations: ["espacioComun", "usuario"],
-        });
-
-        const resultado = reservas.map(reserva => ({
-            id_reserva: reserva.id,
-            estado: reserva.estado,
-            fecha: reserva.fecha,
-            horaInicio: reserva.horaInicio,
-            horaFin: reserva.horaFin,
-            espacioComun: reserva.espacioComun.id_espacio,
-            espacioComun: reserva.espacioComun.nombre,
-        }));
-
+        const [resultado, err] = await getMisReservasServicio(req, res);
+        if (err) return res.status(400).json({ error: err });
         res.status(200).json(resultado);
     } catch (error) {
-        console.error("Error al obtener mis reservas:", error);
+        console.error("Error al obtener las reservas:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
-}
+    }
 
-export async function actualizarEstadoReserva(req, res) {
+    // Actualizar reserva del usuario (pendiente)
+export async function actualizarReserva(req, res) {
     try {
-        const { id } = req.params;
-        const { estado } = req.body;
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-
-        const reserva = await reservaRepository.findOne({ where: { id } });
-        if (!reserva) return res.status(404).json({ error: "Reserva no encontrada" });
-
-        if (!["aprobada", "rechazada"].includes(estado)) {
-        return res.status(400).json({ error: "Estado inválido" });
-        }
-            reserva.estado = estado;
-            await reservaRepository.save(reserva);
-            return res.status(200).json({ message: "Estado de reserva actualizado" });
-
-        } catch (error) {
-            res.status(500).json({ error: "Error al actualizar estado" });
-        }
-        }
-
-        export async function actualizarReservaUsuario(req, res) {
-    try {
-        const { id } = req.params;
-        const userId = req.user.id;
-        const { fecha, horaInicio, horaFin, id_espacio } = req.body;
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);        
-        
-        const reserva = await reservaRepository.findOne({
-            where: { id, usuario: { id: userId } },
-            relations: ["usuario", "espacioComun"],
-        });
-
-                if (!reserva) {
-            return res.status(404).json({ error: "Reserva no encontrada o no autorizada" });
-        }
-        if (reserva.estado !== "pendiente") {
-            return res.status(400).json({ error: "Solo puedes modificar reservas en estado pendiente" });
-        }
-        
-        // Actualizar campos
-        if (fecha) reserva.fecha = fecha;
-        if (horaInicio) reserva.horaInicio = horaInicio;
-        if (horaFin) reserva.horaFin = horaFin;
-        if (id_espacio) reserva.espacioComun = { id_espacio };
-
-        await reservaRepository.save(reserva);
-
-        const respuesta = {
-            fecha: reserva.fecha,
-            horaInicio: reserva.horaInicio,
-            horaFin: reserva.horaFin,
-            estado: reserva.estado,
-            usuario: {
-                nombreCompleto: reserva.usuario.nombreCompleto,
-                email: reserva.usuario.email,
-            },
-            espacioComun: {
-                id_espacio: reserva.espacioComun.id_espacio,
-                nombre: reserva.espacioComun.nombre,
-                descripcion: reserva.espacioComun.descripcion
-            }
-        };
-
-        res.status(200).json({ message: "Reserva actualizada correctamente", reserva: respuesta });
+        const [reserva, err] = await actualizarReservaServicio(req, res);
+        if (err) return res.status(400).json({ error: err });
+        res.status(200).json({ message: "Reserva actualizada correctamente", reserva });
     } catch (error) {
         console.error("Error al actualizar reserva:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
-};
+}
 
-export async function eliminarReservaUsuario(req, res) {
+// Eliminar reserva del usuario
+    export async function eliminarReservaUsuario(req, res) {
     try {
-        const id = parseInt(req.params.id, 10);
-        const userId = req.user.id;
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-
-        // Buscar la reserva y verificar que sea del usuario
-        const reserva = await reservaRepository.findOne({
-            where: { id, usuario: { id: userId } },
-        });
-
-        if (!reserva) {
-            return res.status(404).json({ error: "Reserva no encontrada o no autorizada" });
-        }
-        if (reserva.estado !== "pendiente") {
-            return res.status(400).json({ error: "Solo puedes eliminar reservas en estado pendiente" });
-        }
-
-        await reservaRepository.remove(reserva);
-
+        const [ok, err] = await eliminarReservaUsuario(req, res);
+        if (err) return res.status(400).json({ error: err });
         res.status(200).json({ message: "Reserva eliminada correctamente" });
     } catch (error) {
         console.error("Error al eliminar reserva:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
-}
+    }
+
 /* Solicita cancelar reserva aprobada (USUARIO) */
 export async function solicitarCancelacionReserva(req, res) {
     try {
-        const id = parseInt(req.params.id, 10);
-        const userId = req.user.id;
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-
-        // ver que sea del usuario autenticado
-        const reserva = await reservaRepository.findOne({
-            where: { id, usuario: { id: userId } }
-        });
-        if (!reserva) {
-            return res.status(404).json({ error: "Reserva no encontrada o no autorizada" });
-        }
-
-        // Validar la cancelación con al menos 1 día de anticipación
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-        const fechaReserva = new Date(reserva.fecha);
-        fechaReserva.setHours(0, 0, 0, 0);
-
-        const diferenciaDias = (fechaReserva - hoy) / (1000 * 60 * 60 * 24);
-
-        if (diferenciaDias < 1) {
-            return res.status(400).json({ error: "Solo puedes cancelar hasta 1 día antes de la fecha de la reserva" });
-        }
-
-        // Solo si está aprobada puede solicitar cancelación
-        if (reserva.estado !== "aprobada") {
-            return res.status(400).json({ error: "Solo puedes solicitar cancelación de reservas aprobadas" });
-        }
-
-        reserva.estado = "cancelacion_pendiente";
-        await reservaRepository.save(reserva);
-
-        res.status(200).json({ message: "Solicitud para cancelar enviada. Un administrador debe aprobarla.", reserva });
+        const [reserva, err] = await solicitarCancelacionReservaServicio(req, res);
+        if (err) return res.status(400).json({ error: err });
+        return res.status(200).json({ message: "Solicitud para cancelar enviada.", reserva });
     } catch (error) {
-    console.error("Error al solicitar la cancelación:", error);
-    res.status(500).json({ error: "Error al solicitar la cancelación" });
-}
+        console.error("Error al solicitar la cancelación:", error);
+        return res.status(500).json({ error: "Error al solicitar la cancelación" });
+    }
 }
 /* Obtener reservas pendientes (ADMIN) */
-export async function getReservasAdmin(res) {
+    export async function getReservasAdmin(req, res) {
     try {
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-        const reservas = await reservaRepository.find({
-            where: [
-                { estado: "pendiente" },
-                { estado: "cancelacion_pendiente" }
-            ],
-            relations: ["usuario", "espacioComun"],
-            order: { fecha: "ASC", horaInicio: "ASC" }
-        });
-
-        const resultado = reservas.map(reserva => ({
-            id: reserva.id,
-            estado: reserva.estado,
-            fecha: reserva.fecha,
-            horaInicio: reserva.horaInicio,
-            horaFin: reserva.horaFin,
-            usuario: {
-                id: reserva.usuario.id,
-                nombreCompleto: reserva.usuario.nombreCompleto,
-                email: reserva.usuario.email,
-                rut: reserva.usuario.rut,
-                rol: reserva.usuario.rol
-            },
-            espacioComun: {
-                id_espacio: reserva.espacioComun.id_espacio,
-                nombre: reserva.espacioComun.nombre,
-                descripcion: reserva.espacioComun.descripcion
-            }
-        }));
-
+        const [resultado, err] = await getReservasAdminServicio(res);
+        if (err) return res.status(400).json({ error: err });
         res.status(200).json(resultado);
     } catch (error) {
         console.error("Error al obtener reservas para admin:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
-}
+    }
 
-/* Eliminar reserva cancelada */
+/* Cancelar reserva (ADMIN) */
 export async function cancelarReserva(req, res) {
     try {
-        const { id } = req.params;
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-
-        const reserva = await reservaRepository.findOne({ where: { id } });
-        if (!reserva) return res.status(404).json({ error: "Reserva no encontrada" });
-
-        if (reserva.estado !== "cancelacion_pendiente") {
-            return res.status(400).json({ error: "La reserva no está en estado de cancelación pendiente" });
-        }
-        reserva.estado = "cancelada";
-        await reservaRepository.save(reserva);
-
-    res.status(200).json({ message: "Reserva cancelada por el administrador", reserva });
+        const [reserva, err] = await cancelarReservaServicio(req, res);
+        if (err) return res.status(400).json({ error: err });
+        res.status(200).json({ message: "Reserva cancelada por el administrador", reserva });
     } catch (error) {
         res.status(500).json({ error: "Error al cancelar reserva" });
     }
+}
+
+    export async function actualizarEstadoReserva(req, res) {
+    try {
+        const { id } = req.params;
+        const { estado } = req.body;
+        const [reserva, err] = await actualizarEstadoReservaServicio(id, estado);
+        if (err) return res.status(400).json({ error: err });
+        res.status(200).json({ message: `Reserva ${estado}`, reserva });
+    } catch (error) {
+        console.error("Error al actualizar estado de reserva:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
     }
+}

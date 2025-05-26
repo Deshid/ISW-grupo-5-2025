@@ -7,16 +7,17 @@ import { actualizarEstadoReserva } from "../controllers/reserva.controller.js";
 import { cancelarReserva } from "../controllers/reserva.controller.js";
 import { solicitarCancelacionReserva } from "../controllers/reserva.controller.js";
 import { getMisReservas } from "../controllers/reserva.controller.js";
-import { actualizarReservaUsuario } from "../controllers/reserva.controller.js";
 import { eliminarReservaUsuario } from "../controllers/reserva.controller.js";
 import { getReservasAdmin } from "../controllers/reserva.controller.js";
+import { actualizarReserva } from "../controllers/reserva.controller.js";
+
 const router = Router();
 
-router.post("/", crearReserva);
-router.get("/", getReservas);
+router.post("/", authenticateJwt, crearReserva);
+router.get("/", authenticateJwt, getReservas);
 router.patch("/:id/estado", authenticateJwt, isAdmin, actualizarEstadoReserva);
 router.get("/mis-reservas", authenticateJwt, getMisReservas);
-router.patch("/:id", authenticateJwt, actualizarReservaUsuario);
+router.patch("/:id", authenticateJwt, actualizarReserva);
 router.delete("/:id", authenticateJwt, eliminarReservaUsuario);
 router.patch("/:id/solicitar-cancelacion", authenticateJwt, solicitarCancelacionReserva);
 router.patch("/:id/cancelar", authenticateJwt, isAdmin, cancelarReserva);
