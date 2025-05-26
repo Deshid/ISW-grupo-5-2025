@@ -81,4 +81,46 @@ async function createUsers() {
   }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////7
+import { EspacioComunSchema } from "../entity/reserva.entity.js";
+    async function createEspaciosComunes() {
+    try {
+        const espacioRepository = AppDataSource.getRepository(EspacioComunSchema);
+        const count = await espacioRepository.count();
+        if (count > 0) return;
+
+        await Promise.all([
+        espacioRepository.save(
+            espacioRepository.create({
+            id_espacio: 1,
+            nombre: "Quincho",
+            descripcion: "Quincho techado",
+            disponibilidad: true,
+            })
+        ),
+        espacioRepository.save(
+            espacioRepository.create({
+            id_espacio: 2,
+            nombre: "Sala Multiuso",
+            descripcion: "Sala para eventos y reuniones",
+            disponibilidad: true,
+            })
+        ),
+        espacioRepository.save(
+            espacioRepository.create({
+            id_espacio: 3,
+            nombre: "Patio",
+            descripcion: "Patio de juegos para niños",
+            disponibilidad: true,
+            })
+        ),
+        ]);
+        console.log("* => Espacios comunes creados exitosamente");
+    } catch (error) {
+        console.error("Error al crear espacios comunes:", error);
+    }
+    }
+
+    export { createEspaciosComunes };
+
 export { createUsers };
