@@ -11,7 +11,7 @@ const ReclamoSchema = new EntitySchema({
             generated: true,
         },
         fecha: {
-            type: Date,
+            type: "timestamp with time zone",
             default: () => "CURRENT_TIMESTAMP",
             },
         descripcion: {
@@ -25,14 +25,7 @@ const ReclamoSchema = new EntitySchema({
             },
         usuarioId: {
             type: Number,
-            nullable: false,
-            },
-        },
-        relations: {
-            usuario: {
-                type: "many-to-one",
-                target: "Usuario",
-                joinColumn: { name: "usuarioId" },
+            nullable: true,
             },
         },
         relations: {
