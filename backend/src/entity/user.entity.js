@@ -73,6 +73,20 @@ const UserSchema = new EntitySchema({
       unique: true,
     },
   ],
+  relations: {
+    sanciones: {
+      type: "one-to-many",
+      target: "Sancion",
+      inverseSide: "usuario",
+      cascade: true,
+    },
+    reservas: {
+      type: "one-to-many",
+      target: "Reserva",
+      inverseSide: "usuario",
+    },
+    
+  },
 });
 
 export default UserSchema;

@@ -1,27 +1,31 @@
 "use strict";
-import { In } from "typeorm";
+import { In, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 import { AppDataSource } from "../config/configDb.js";
 import { ReservaSchema } from "../entity/reserva.entity.js";
+import { SancionSchema } from "../entity/sancion.entity.js";
 
-// sanciones (ADMIN)
-export async function sancionarUsuarioServicio(id, sancionado = true) {
-    const userRepository = AppDataSource.getRepository(UserSchema);
-    const usuario = await userRepository.findOne({ where: { id } });
-    if (!usuario) return [null, "Usuario no encontrado"];
-    usuario.sancionado = sancionado;
-    await userRepository.save(usuario);
-    return [usuario, null];
-}
+
 
 // servicio para reservar espacio comun, crear reserva
+
 export async function reservarEspacioServicio({ id, id_espacio, fecha, horaInicio, horaFin }) {
     try {
-        // validando si es que está sancionado
-        const userRepository = AppDataSource.getRepository("User");
-        const usuario = await userRepository.findOne({ where: { id } });
-        if (usuario.sancionado) {
-            return [null, "No puedes reservar porque estás sancionado. Comuniquese con el presidente del condominio."];
+        const sancionRepository = AppDataSource.getRepository(SancionSchema);
+        const hoySancion = new Date();
+        hoySancion.setHours(0, 0, 0, 0);
+        const sancionActiva = await sancionRepository.findOne({
+            where: {
+                usuario: { id },
+                fecha_inicio: LessThanOrEqual(hoySancion),
+                fecha_fin: MoreThanOrEqual(hoySancion)
+            }
+        });
+
+        if (sancionActiva) {
+            return [null, "No puedes reservar porque tienes una sanción activa. Comunícate con el administrador."];
         }
+console.log("Buscando sanción activa para usuario:", id);
+console.log("Resultado sancionActiva:", sancionActiva);
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
         // Validar que la hora de inicio sea menor que la de fin
         if (horaInicio >= horaFin) {
@@ -47,12 +51,11 @@ export async function reservarEspacioServicio({ id, id_espacio, fecha, horaInici
         if (diferenciaDias < 1 || diferenciaDias > 15) {
             return [null, "Solo puedes reservar con al menos 1 día y hasta 15 días de anticipación."];
         }
-
         // Obtener todas las reservas activas del usuario
         const reservasUsuario = await reservaRepository.find({
             where: { usuario: { id } }
         });
-        // revisar este: // Filtrar solo las reservas futuras activas (pendiente o aprobada y fecha >= hoy)
+        // Filtrar solo las reservas futuras activas (pendiente o aprobada)
         const hoy2 = new Date();
         hoy2.setHours(0, 0, 0, 0);
         const reservasActivas = reservasUsuario.filter(r =>
@@ -63,7 +66,6 @@ export async function reservarEspacioServicio({ id, id_espacio, fecha, horaInici
         return [null, "Solo puedes tener 3 reservas activas. Cancela o espera a usar alguna para reservar otra vez."];
             }
         // solo se puede reservar hasta 4 horas continuas el mismo día,
-        // esta sección fue con ayuda de internet ya que me parecio dificil para mi :(
         function horaStringAMinutos(horaStr) {
             const [h, m] = horaStr.split(":").map(Number);
             return h * 60 + m;
