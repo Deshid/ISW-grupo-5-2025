@@ -24,8 +24,8 @@ export async function reservarEspacioServicio({ id, id_espacio, fecha, horaInici
         if (sancionActiva) {
             return [null, "No puedes reservar porque tienes una sanción activa. Comunícate con el administrador."];
         }
-console.log("Buscando sanción activa para usuario:", id);
-console.log("Resultado sancionActiva:", sancionActiva);
+// console.log("Buscando sanción activa para usuario:", id);
+// console.log("Resultado sancionActiva:", sancionActiva);
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
         // Validar que la hora de inicio sea menor que la de fin
         if (horaInicio >= horaFin) {
@@ -98,8 +98,13 @@ console.log("Resultado sancionActiva:", sancionActiva);
             horaFin: reservaCompleta.horaFin,
             usuario: {
                 id: reservaCompleta.usuario.id,
+                rut: reservaCompleta.usuario.rut,
                 nombre: reservaCompleta.usuario.nombreCompleto,
-                email: reservaCompleta.usuario.email,
+                email: reservaCompleta.usuario.email, 
+                telefono: reservaCompleta.usuario.telefono,
+                whatsapp: reservaCompleta.usuario.whatsapp,
+                departamento: reservaCompleta.usuario.departamento,
+                rol: reservaCompleta.usuario.rol
             },
             espacioComun: {
                 id: reservaCompleta.espacioComun.id_espacio,
