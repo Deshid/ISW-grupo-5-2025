@@ -53,13 +53,15 @@ export async function getUsers(req, res) {
 
 export async function updateUser(req, res) {
   try {
-    const { rut, id, email } = req.query;
+    const { rut, id, email, telefono, whatsapp } = req.query;
     const { body } = req;
 
     const { error: queryError } = userQueryValidation.validate({
       rut,
       id,
       email,
+      telefono,
+      whatsapp,
     });
 
     if (queryError) {
@@ -93,12 +95,13 @@ export async function updateUser(req, res) {
 
 export async function deleteUser(req, res) {
   try {
-    const { rut, id, email } = req.query;
+    const { rut, id, email, telefono } = req.query;
 
     const { error: queryError } = userQueryValidation.validate({
       rut,
       id,
       email,
+      telefono,
     });
 
     if (queryError) {
@@ -114,6 +117,7 @@ export async function deleteUser(req, res) {
       rut,
       id,
       email,
+      telefono,
     });
 
     if (errorUserDelete) return handleErrorClient(res, 404, "Error eliminado al usuario", errorUserDelete);

@@ -32,13 +32,19 @@ const UserSchema = new EntitySchema({
       length: 50,
       nullable: false,
     },
-    departamento:{
+    departamento: {
       type: "varchar",
-      nullable: true, //momentaneo mientras resuelvo el bug
+      nullable: false, //momentaneo mientras resuelvo el bug
     },
-    whatsapp:{
+ /* telefono */
+    telefono: {
+      type: "varchar",
+      length: 10,
+      nullable: false,
+    },
+    whatsapp: {
       type: "int",
-      nullable: true,
+      nullable: false,
     },
     password: {
       type: "varchar",
@@ -73,6 +79,20 @@ const UserSchema = new EntitySchema({
       unique: true,
     },
   ],
+  relations: {
+    sanciones: {
+      type: "one-to-many",
+      target: "Sancion",
+      inverseSide: "usuario",
+      cascade: true,
+    },
+    reservas: {
+      type: "one-to-many",
+      target: "Reserva",
+      inverseSide: "usuario",
+    },
+    
+  },
 });
 
 export default UserSchema;

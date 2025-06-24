@@ -75,6 +75,8 @@ export async function updateUserService(query, body) {
       rut: body.rut,
       email: body.email,
       rol: body.rol,
+      telefono: body.telefono,
+      whatsapp: body.whatsapp,
       updatedAt: new Date(),
     };
 
