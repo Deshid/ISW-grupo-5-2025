@@ -120,7 +120,7 @@ export async function cancelarReclamo(req, res) {
     try {
         const { id } = req.params;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
-        const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) } });
+        const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["usuario"] });
         if (!reclamo) {
             return handleErrorClient(res, 404, "Reclamo no encontrado");
         }
