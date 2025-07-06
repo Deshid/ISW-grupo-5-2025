@@ -9,10 +9,10 @@ export async function createPagoService(data) {
         const pagoRepository = AppDataSource.getRepository(PagoSchema);
         const userRepository = AppDataSource.getRepository(UserSchema);
 
-            let user;
-        if (data.rut) { 
+        let user;
+        if (data.rut) {
             user = await userRepository.findOne({ where: { rut: data.rut } });
-        } else if (data.departamento) { 
+        } else if (data.departamento) {
             user = await userRepository.findOne({ where: { departamento: data.departamento } });
         }
 
@@ -21,13 +21,13 @@ export async function createPagoService(data) {
         }
 
         const nuevoPago = pagoRepository.create({
-            nombreCompleto: data.nombreCompleto,
-            rut: data.rut,
-            departamento: data.departamento,
             monto: data.monto,
+            mes: data.mes,
             fechaPago: data.fechaPago,
-            metodo: data.metodo 
+            metodo: data.metodo,
+            user: user 
         });
+
 
         const pagoGuardado = await pagoRepository.save(nuevoPago);
 
