@@ -34,7 +34,8 @@ const UserSchema = new EntitySchema({
     },
     departamento: {
       type: "varchar",
-      nullable: false, //momentaneo mientras resuelvo el bug
+      nullable: true, 
+
     },
  /* telefono */
     telefono: {

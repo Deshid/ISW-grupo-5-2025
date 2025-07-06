@@ -9,24 +9,28 @@ export async function createPagoService(data) {
         const pagoRepository = AppDataSource.getRepository(PagoSchema);
         const userRepository = AppDataSource.getRepository(UserSchema);
 
-            let user;
-        if (data.rut) { 
+        let user;
+        if (data.rut) {
             user = await userRepository.findOne({ where: { rut: data.rut } });
-        } else if (data.departamento) { 
-            user = await userRepository.findOne({ where: { departamento: data.departamento } });
+        } else if (data.departamento) {
+            user = await userRepository.findOne({
+                where: { departamento: data.departamento },
+            });
         }
 
         if (!user) {
-            return [null, "Residente no encontrado con el RUT o Departamento proporcionado."];
+            return [
+                null,
+                "Residente no encontrado con el RUT o Departamento proporcionado.",
+            ];
         }
 
         const nuevoPago = pagoRepository.create({
-            nombreCompleto: data.nombreCompleto,
-            rut: data.rut,
-            departamento: data.departamento,
             monto: data.monto,
+            mes: data.mes,
             fechaPago: data.fechaPago,
-            metodo: data.metodo 
+            metodo: data.metodo,
+            user: user,
         });
 
         const pagoGuardado = await pagoRepository.save(nuevoPago);
@@ -43,7 +47,7 @@ export async function getPagosService() {
         const pagoRepository = AppDataSource.getRepository(PagoSchema);
 
         const pagos = await pagoRepository.find({
-            relation: ["user"],
+            relations: ["user"],
             order: { fechaPago: "DESC" },
         });
 
@@ -60,7 +64,10 @@ export async function getPagoService({ idPago }) {
     try {
         const pagoRepository = AppDataSource.getRepository(PagoSchema);
 
-        const pago = await pagoRepository.findOneBy({ idPago: idPago });
+        const pago = await pagoRepository.findOne({
+            where: { idPago },
+            relations: ["user"],
+        });
 
         if (!pago) return [null, "Pago no encontrado"];
 
@@ -75,7 +82,10 @@ export async function deletePagoService({ idPago }) {
     try {
         const pagoRepository = AppDataSource.getRepository(PagoSchema);
 
-        const pago = await pagoRepository.findOneBy({ idPago: idPago });
+        const pago = await pagoRepository.findOne({
+            where: { idPago },
+            relations: ["user"],
+        });
 
         if (!pago) return [null, "Pago no encontrado"];
 

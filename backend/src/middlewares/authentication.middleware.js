@@ -40,3 +40,4 @@ export function isTesorero(req, res, next) {
   });
 
 }
+
