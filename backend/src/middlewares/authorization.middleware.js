@@ -73,6 +73,7 @@ export async function isAdmin(req, res, next) {
             error.message,
         );
     }
+
 }
 
 export function isTesorero(req, res, next) {

@@ -9,6 +9,8 @@ import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
 
+import Reservas from '@components/ReservaForm';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -26,8 +28,9 @@ const router = createBrowserRouter([
           <Users />
         </ProtectedRoute>
         ),
-    }
+    },
     ]
+    // rutas autorizadas para todos los usuarios autenticados
   },
   {
     path: '/auth',
@@ -36,7 +39,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register/>
-  }
+  },
+  {  path: '/reservas',
+    element: <Reservas/>
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(

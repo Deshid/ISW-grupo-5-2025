@@ -1,85 +1,145 @@
-    "use strict";
-    import { AppDataSource } from "../config/configDb.js";
-    import { ReservaSchema } from "../entity/reserva.entity.js";
+"use strict";
+import { In, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+import { AppDataSource } from "../config/configDb.js";
+import { ReservaSchema } from "../entity/reserva.entity.js";
+import { SancionSchema } from "../entity/sancion.entity.js";
 
-    // servicio para reservar espacio comun, crear reserva
+// servicio para reservar espacio comun, crear reserva
 export async function reservarEspacioServicio({ id, id_espacio, fecha, horaInicio, horaFin }) {
     try {
+        const sancionRepository = AppDataSource.getRepository(SancionSchema);
+        const hoySancion = new Date();
+        hoySancion.setHours(0, 0, 0, 0);
+        const sancionActiva = await sancionRepository.findOne({
+            where: {
+                usuario: { id },
+                fecha_inicio: LessThanOrEqual(hoySancion),
+                fecha_fin: MoreThanOrEqual(hoySancion)
+            }
+        });
+
+        if (sancionActiva) {
+            return [null, "No puedes reservar porque tienes una sanción activa. Comunícate con el administrador."];
+        }
+// console.log("Buscando sanción activa para usuario:", id);
+// console.log("Resultado sancionActiva:", sancionActiva);
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
         // Validar que la hora de inicio sea menor que la de fin
         if (horaInicio >= horaFin) {
-        return [null, "La hora de inicio debe ser menor que la hora de fin."];
+            return [null, "La hora de inicio debe ser menor que la hora de fin."];
         }
         // Verificar si ya existe una reserva que colisione en ese espacio comun y fecha
         const reservasColisionadas = await reservaRepository.find({
-        where: { espacioComun: { id_espacio }, fecha, },
-        relations: ["espacioComun", "usuario"],
+            where: { espacioComun: { id_espacio }, fecha, 
+                    estado: In(["pendiente", "aprobada", "cancelacion_pendiente"]) 
+                },
+            relations: ["espacioComun", "usuario"],
         });
         const hayColision = reservasColisionadas.some(r => (horaInicio < r.horaFin && horaFin > r.horaInicio));
         if (hayColision) {
-        return [null, "El espacio ya está reservado en ese horario."];
+            return [null, "El espacio ya está reservado en ese horario."];
         }
+        // solo puede reservar con al menos 1 dia de anticipacion y hasta 15 dias antes de la fecha reservada
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const fechaReserva = new Date(fecha);
+        fechaReserva.setHours(0, 0, 0, 0);
+        const diferenciaDias = (fechaReserva - hoy) / (1000 * 60 * 60 * 24);
+        if (diferenciaDias < 1 || diferenciaDias > 15) {
+            return [null, "Solo puedes reservar con al menos 1 día y hasta 15 días de anticipación."];
+        }
+        // Obtener todas las reservas activas del usuario
+        const reservasUsuario = await reservaRepository.find({
+            where: { usuario: { id } }
+        });
+        // Filtrar solo las reservas futuras activas (pendiente o aprobada)
+        const hoy2 = new Date();
+        hoy2.setHours(0, 0, 0, 0);
+        const reservasActivas = reservasUsuario.filter(r =>
+            (r.estado === "pendiente" || r.estado === "aprobada") && new Date(r.fecha) >= hoy2
+        );
+
+        if (reservasActivas.length >= 3) {
+        return [null, "Solo puedes tener 3 reservas activas. Cancela o espera a usar alguna para reservar otra vez."];
+            }
+        // solo se puede reservar hasta 4 horas continuas el mismo día,
+        function horaStringAMinutos(horaStr) {
+            const [h, m] = horaStr.split(":").map(Number);
+            return h * 60 + m;
+            }
+            const minutosInicio = horaStringAMinutos(horaInicio);
+            const minutosFin = horaStringAMinutos(horaFin);
+            const duracion = minutosFin - minutosInicio;
+                if (duracion > 240) { // 4 horas * 60 minutos
+                    return [null, "Solo puedes reservar hasta 4 horas continuas en un mismo día."];
+                }
         // creando reserva
         const nuevaReserva = reservaRepository.create({
-        usuario: { id },
-        espacioComun: { id_espacio },
-        fecha,
-        horaInicio,
-        horaFin,
-        estado: "pendiente"
+            usuario: { id },
+            espacioComun: { id_espacio },
+            fecha,
+            horaInicio,
+            horaFin,
+            estado: "pendiente"
         });
         // guardando reserva
         await reservaRepository.save(nuevaReserva);
-        const reservaCompleta  = await reservaRepository.findOne({
+        const reservaCompleta = await reservaRepository.findOne({
             where: { id: nuevaReserva.id },
             relations: ["usuario", "espacioComun"],
-            });
-        const dataReserva = { 
-        estado: reservaCompleta.estado,
-        fecha: reservaCompleta.fecha,
-        horaInicio: reservaCompleta.horaInicio,
-        horaFin: reservaCompleta.horaFin,
-        usuario: {
-        id: reservaCompleta.usuario.id,
-        nombre: reservaCompleta.usuario.nombreCompleto,
-        email: reservaCompleta.usuario.email,
-        },
-        espacioComun: {
-        id: reservaCompleta.espacioComun.id_espacio,
-        nombre: reservaCompleta.espacioComun.nombre,
-        } };
+        });
+        const dataReserva = {
+            estado: reservaCompleta.estado,
+            fecha: reservaCompleta.fecha,
+            horaInicio: reservaCompleta.horaInicio,
+            horaFin: reservaCompleta.horaFin,
+            usuario: {
+                id: reservaCompleta.usuario.id,
+                rut: reservaCompleta.usuario.rut,
+                nombre: reservaCompleta.usuario.nombreCompleto,
+                email: reservaCompleta.usuario.email, 
+                telefono: reservaCompleta.usuario.telefono,
+                whatsapp: reservaCompleta.usuario.whatsapp,
+                departamento: reservaCompleta.usuario.departamento,
+                rol: reservaCompleta.usuario.rol
+            },
+            espacioComun: {
+                id: reservaCompleta.espacioComun.id_espacio,
+                nombre: reservaCompleta.espacioComun.nombre,
+            }
+        };
         return [dataReserva, null];
     } catch (error) {
         console.error("Error al reservar espacio común:", error);
         return [null, "Error interno del servidor"];
     }
-    }
+}
 
 export async function getReservasServicio({ id_espacio, fecha }) {
-    try{
+    try {
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
         const reservas = await reservaRepository.find({
-        where: { espacioComun: { id_espacio: id_espacio }, fecha, },
-        relations: ["espacioComun", "usuario"],
+            where: { espacioComun: { id_espacio: id_espacio }, fecha, },
+            relations: ["espacioComun", "usuario"],
         });
-    // devuelve las reservas encontradas
-    const reservaEncontrada = reservas.map(reserva => ({
-        estado: reserva.estado,
-        horaInicio: reserva.horaInicio,
-        horaFin: reserva.horaFin,
-        espacioComun: reserva.espacioComun.nombre,
-        usuario: reserva.usuario.nombreCompleto,
+        // devuelve las reservas encontradas
+        const reservaEncontrada = reservas.map(reserva => ({
+            estado: reserva.estado,
+            horaInicio: reserva.horaInicio,
+            horaFin: reserva.horaFin,
+            espacioComun: reserva.espacioComun.nombre,
+            usuario: reserva.usuario.nombreCompleto,
         }));
         return [reservaEncontrada, null];
-    }catch (error) {
+    } catch (error) {
         console.error("Error al obtener reservas:", error);
-        return [null, "Error interno del servidor"];    
+        return [null, "Error interno del servidor"];
     }
 }
 // Obtener reservas de un usuario
 export async function getMisReservasServicio(req, res) {
     try {
-        const userId = req.user.id; 
+        const userId = req.user.id;
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
         const reservas = await reservaRepository.find({
             where: { usuario: { id: userId } },
@@ -97,7 +157,7 @@ export async function getMisReservasServicio(req, res) {
         return [resultado, null];
     } catch (error) {
         console.error("Error al obtener mis reservas:", error);
-        return [null, "Error interno del servidor"];    
+        return [null, "Error interno del servidor"];
     }
 }
 // Actualizar reserva de usuario
@@ -113,6 +173,9 @@ export async function actualizarReservaServicio(req, res) {
         });
         if (!reserva) return [null, "Reserva no encontrada"];
         if (reserva.estado !== "pendiente") return [null, "Solo puedes modificar reservas en estado pendiente"];
+        if (diferenciaDias < 1) {
+            return [null, "Solo puedes modificar reservas con al menos 1 día de anticipación"];
+        }
         if (fecha) reserva.fecha = fecha;
         if (horaInicio) reserva.horaInicio = horaInicio;
         if (horaFin) reserva.horaFin = horaFin;
@@ -140,29 +203,6 @@ export async function actualizarReservaServicio(req, res) {
     }
 }
 
-// Eliminar reserva de usuario
-export async function eliminarReservaUsuarioServicio(req, res) {
-    try {
-        const id = parseInt(req.params.id, 10);
-        const userId = req.user.id;
-        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
-        // Buscar la reserva y verificar que sea del usuario
-        const reserva = await reservaRepository.findOne({
-            where: { id, usuario: { id: userId } },
-        });
-        if (!reserva) {
-            return [null, "Reserva no encontrada o no autorizada"];
-        }
-        if (reserva.estado !== "pendiente") {
-            return [null, "Solo puedes eliminar reservas en estado pendiente"];
-        }
-        await reservaRepository.remove(reserva);
-        return [true, null];
-    } catch (error) {
-        console.error("Error al eliminar reserva:", error);
-        return [null, "Error interno del servidor"];
-    }
-}
 /* Solicita cancelar reserva aprobada (USUARIO) */
 export async function solicitarCancelacionReservaServicio(req, res) {
     try {
@@ -185,17 +225,24 @@ export async function solicitarCancelacionReservaServicio(req, res) {
         if (diferenciaDias < 1) {
             return [null, "Solo puedes cancelar hasta 1 día antes de la fecha de la reserva"];
         }
-        // Solo si está aprobada puede solicitar cancelación
-        if (reserva.estado !== "aprobada") {
-            return [null, "Solo puedes solicitar cancelación de reservas aprobadas"];
+        // verificar el estado de la reserva
+        if (reserva.estado === "rechazada" || reserva.estado === "cancelada") {
+            return [null, "No puedes cancelar una reserva que ya está rechazada o cancelada."];
+        }
+        // elimina la reserva automáticamente si está pendiente
+        if (reserva.estado === "pendiente") {
+            // await reservaRepository.remove(reserva);
+            reserva.estado = "cancelada";
+            await reservaRepository.save(reserva);
+            return [reserva, null];
         }
         reserva.estado = "cancelacion_pendiente";
         await reservaRepository.save(reserva);
-    return [reserva, null];
+        return [reserva, null];
     } catch (error) {
-    console.error("Error al solicitar la cancelación:", error);
-    return [null, "Error interno del servidor"];
-}
+        console.error("Error al solicitar la cancelación:", error);
+        return [null, "Error interno del servidor"];
+    }
 }
 
 /* Obtener reservas pendientes (ADMIN) */
@@ -203,7 +250,7 @@ export async function getReservasAdminServicio(res) {
     try {
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
         const reservas = await reservaRepository.find({
-            where: [{ estado: "pendiente" },{ estado: "cancelacion_pendiente" }],
+            where: [{ estado: "pendiente" }, { estado: "cancelacion_pendiente" }],
             relations: ["usuario", "espacioComun"],
             order: { fecha: "ASC", horaInicio: "ASC" }
         });
@@ -239,17 +286,17 @@ export async function cancelarReservaServicio(req, res) {
         const { id } = req.params;
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
         const reserva = await reservaRepository.findOne({ where: { id } });
-        if (!reserva) 
+        if (!reserva)
             return [null, "Reserva no encontrada"];
         if (reserva.estado !== "cancelacion_pendiente") {
             return [null, "La reserva no está en estado de cancelación pendiente"];
         }
         reserva.estado = "cancelada";
         await reservaRepository.save(reserva);
-        return [reserva, null];    
+        return [reserva, null];
     } catch (error) {
-    console.error("Error al cancelar reserva:", error);
-    return [null, "Error interno del servidor"];
+        console.error("Error al cancelar reserva:", error);
+        return [null, "Error interno del servidor"];
     }
 }
 

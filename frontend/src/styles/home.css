@@ -1,0 +1,126 @@
+/* Aplica a toda la pantalla */
+.home-container {
+    background-image: url('https://images.wikidexcdn.net/mwuploads/wikidex/8/83/Prado_Herradura.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: space-between; /* Distribuye el espacio entre el contenido y las imágenes */
+    align-items: center; /* Alinea los elementos al centro */
+    box-sizing: border-box; /* Incluye el padding en el ancho total */
+}
+
+/* Contenedor del texto */
+.home-text-box {
+    width: 400px; /* Ajusta el ancho del contenedor del marco */
+    height: 400px; /* Ajusta la altura del contenedor del marco */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;    
+    text-align: center;
+    position: relative;
+    background: #fff7f74d; /* Color, la transparencia se maneja con el backdrop-filter */
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 32px;
+    z-index: 1; /* Asegura que esté está detrás del marco, son como las capas */
+
+    background-color: rgba(255, 255, 255, 0.267);
+    backdrop-filter: blur(8px); /* Aplica un desenfoque */
+
+}
+
+/* Fondo ajustable para el segundo text box */
+.home-text-bg-auto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: calc(50% - 50px); /* Ajusta el tamaño según sea necesario */
+    height: calc(50% - 50px);
+    margin: 0 auto;
+    position: relative;
+    z-index: 3; /* Texto encima del marco */
+}
+
+
+/* Imagen del marco */
+.home-text-box::before {
+    content: '';
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2; /* Establece z-index más alto que .home-text-box para que esté encima */
+}
+
+/* Lado izquierdo*/
+.home-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    z-index: 1;
+    flex-shrink: 0.5;
+}
+
+/* Contenedor para las imágenes del lado derecho */
+.home-images {
+    flex: 1;
+    position: relative;
+    width: 600px;
+    height: 640px;
+    overflow: hidden;
+    margin-left: 40px;
+}
+
+/* Lado derecho - imagen 1*/
+.home-image {
+    background-image: url('https://media.istockphoto.com/id/1492424940/es/foto/apartamento-buidling.jpg?s=612x612&w=0&k=20&c=eyeoo_8E0vyxUSddLLlc_71qrj_k1zajR2LtsEq1Sgo=');
+    background-size: cover;
+    background-position: center;
+    width: 600px;
+    height: 320px;
+    clip-path: polygon(20% 0, 100% 0, 100% 100%, 20% 100%, 0% 50%);
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+}
+
+/* Imagen de abajo - imagen 2 */
+.home-image2 {
+    background-image: url('https://img.freepik.com/foto-gratis/paisaje-analogico-ciudad-edificios_23-2149661456.jpg');
+    background-size: cover;
+    background-position: center;
+    width: 600px;
+    height: 320px;
+    clip-path: polygon(20% 0, 100% 0, 100% 100%, 20% 100%, 0% 50%);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+}
+
+/* Título principal */
+.home-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Subtítulo */
+.home-subtitle {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #07977f;
+    margin-top: 0.5rem;
+}

@@ -9,8 +9,12 @@ import express, { json, urlencoded } from "express";
 import { cookieKey, HOST, PORT } from "./config/configEnv.js";
 import { connectDB } from "./config/configDb.js";
 import { passportJwtSetup } from "./auth/passport.auth.js";
+
+
 import { createEspaciosComunes, createUsers } from "./config/initialSetup.js";
 import reservaRoutes from "./routes/reserva.routes.js";
+import sancionRoutes from "./routes/sancion.routes.js";
+import espacioRoutes from "./routes/reserva.routes.js";
 
 async function setupServer() {
   try {
@@ -57,12 +61,12 @@ async function setupServer() {
 
     app.use(passport.initialize());
     app.use(passport.session());
-
     passportJwtSetup();
-
     app.use("/api", indexRoutes);
     app.use("/api/reservas", reservaRoutes);
-
+    app.use("/api/usuarios", sancionRoutes);
+    app.use("/api/espacios", espacioRoutes);
+    
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
     });
