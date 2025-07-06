@@ -10,7 +10,6 @@ import {
 import { reclamoBodyValidation } from "../validations/reclamos.validation.js";
 import { formatoFecha } from "../helpers/dateFormat.js"
 
-
 export async function crearReclamo(req, res) {
     try {
         const { error } = reclamoBodyValidation.validate(req.body);
@@ -30,7 +29,7 @@ export async function crearReclamo(req, res) {
             categoria,
             anonimo: !!anonimo,
             estado: "pendiente",
-            usuario: anonimo ? null : { id: req.user.id },
+            usuario: { id: req.user.id }
         });
 
         await reclamoRepository.save(nuevoReclamo);
@@ -44,6 +43,7 @@ export async function crearReclamo(req, res) {
 
 export async function getAllReclamos(req, res) {
     try {
+        const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const esAdmin = req.user.rol === "administrador";
         const reclamos = await reclamoRepository.find({ relations: ["usuario"] });
         const reclamosFiltrados = reclamos.map(r => {
@@ -153,6 +153,21 @@ export async function getReclamosPendientes(req, res) {
             return handleErrorClient(res, 200, "No hay reclamos pendientes o en proceso", []);
         }
         return handleSuccess(res, 200, "Reclamos pendientes encontrados", reclamos);
+    } catch (error) {
+        handleErrorServer(res, 500, error.message);
+    }
+}
+
+export async function getReclamosConIdentidad(req, res) {
+    try {
+        const reclamoRepository = AppDataSource.getRepository(Reclamo);
+        const reclamos = await reclamoRepository.find({ relations: ["usuario"] });
+        // El admin puede ver la identidad incluso en anónimos, así que no ocultes nada
+        const reclamosFormateados = reclamos.map(r => ({
+            ...r,
+            fecha: formatoFecha(r.fecha)
+        }));
+        return handleSuccess(res, 200, "Reclamos con identidad", reclamosFormateados);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
