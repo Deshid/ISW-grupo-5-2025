@@ -22,9 +22,7 @@ router.post("/",
 router.get("/", 
     authenticateJwt, 
     authorizeRoles("administrador", 
-                    "presidente", 
-                    "secretario", 
-                    "tesorero"),
+                    "presidente",),
     getAllReclamos
 );
 

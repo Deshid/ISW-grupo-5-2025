@@ -62,19 +62,3 @@ export async function logout(req, res) {
     handleErrorServer(res, 500, error.message);
   }
 }
-
-export async function getMisReclamos(req, res) {
-  try {
-    const reclamoRepository = AppDataSource.getRepository(Reclamo);
-    const reclamos = await reclamoRepository.find({
-      where: { usuario: req.user.id },
-      relations: ["usuario"],
-    });
-    if (!reclamos || reclamos.length === 0) {
-      return handleErrorClient(res, 200, "No existen reclamos enviados en su historial", []);
-    }
-    return handleSuccess(res, 200, "Reclamos obtenidos exitosamente", reclamos);
-  } catch (error) {
-    handleErrorServer(res, 500, error.message);
-  }
-}
