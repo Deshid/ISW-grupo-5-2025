@@ -8,7 +8,7 @@ import {
     handleSuccess 
     } from "../handlers/responseHandlers.js";
 import { reclamoBodyValidation } from "../validations/reclamos.validation.js";
-
+import { formatoFecha } from "../helpers/dateFormat.js"
 
 
 export async function crearReclamo(req, res) {
@@ -47,12 +47,16 @@ export async function getAllReclamos(req, res) {
         const esAdmin = req.user.rol === "administrador";
         const reclamos = await reclamoRepository.find({ relations: ["usuario"] });
         const reclamosFiltrados = reclamos.map(r => {
+            const reclamoFormateado = {
+                ...r,
+                fecha: formatoFecha(r.fecha)
+            };
             if (r.anonimo && !esAdmin) {
-            return { ...r, usuario: null };
+                return { ...reclamoFormateado, usuario: null };
             }
-        return r;
-});
-return handleSuccess(res, 200, "Reclamos encontrados", reclamosFiltrados);
+            return reclamoFormateado;
+        });
+        return handleSuccess(res, 200, "Reclamos encontrados", reclamosFiltrados);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
@@ -94,15 +98,19 @@ export async function updateEstadoReclamo(req, res) {
 
 export async function getMisReclamos(req, res) {
     try {
-    const reclamoRepository = AppDataSource.getRepository(Reclamo);
-    const reclamos = await reclamoRepository.find({
-        where: { usuario: req.user.id },
-        relations: ["usuario"],
-    });
+        const reclamoRepository = AppDataSource.getRepository(Reclamo);
+        const reclamos = await reclamoRepository.find({
+            where: { usuario: { id: req.user.id } },
+            relations: ["usuario"],
+        });
         if (!reclamos || reclamos.length === 0) {
             return handleErrorClient(res, 200, "No existen reclamos enviados en su historial", []);
         }
-        return handleSuccess(res, 200, "Reclamos obtenidos exitosamente", reclamos);
+        const reclamosFormateados = reclamos.map(r => ({
+            ...r,
+            fecha: formatoFecha(r.fecha)
+        }));
+        return handleSuccess(res, 200, "Reclamos obtenidos exitosamente", reclamosFormateados);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
