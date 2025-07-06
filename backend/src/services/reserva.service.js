@@ -4,10 +4,7 @@ import { AppDataSource } from "../config/configDb.js";
 import { ReservaSchema } from "../entity/reserva.entity.js";
 import { SancionSchema } from "../entity/sancion.entity.js";
 
-
-
 // servicio para reservar espacio comun, crear reserva
-
 export async function reservarEspacioServicio({ id, id_espacio, fecha, horaInicio, horaFin }) {
     try {
         const sancionRepository = AppDataSource.getRepository(SancionSchema);
