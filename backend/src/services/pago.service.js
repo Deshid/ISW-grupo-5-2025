@@ -13,11 +13,16 @@ export async function createPagoService(data) {
         if (data.rut) {
             user = await userRepository.findOne({ where: { rut: data.rut } });
         } else if (data.departamento) {
-            user = await userRepository.findOne({ where: { departamento: data.departamento } });
+            user = await userRepository.findOne({
+                where: { departamento: data.departamento },
+            });
         }
 
         if (!user) {
-            return [null, "Residente no encontrado con el RUT o Departamento proporcionado."];
+            return [
+                null,
+                "Residente no encontrado con el RUT o Departamento proporcionado.",
+            ];
         }
 
         const nuevoPago = pagoRepository.create({
@@ -25,9 +30,8 @@ export async function createPagoService(data) {
             mes: data.mes,
             fechaPago: data.fechaPago,
             metodo: data.metodo,
-            user: user 
+            user: user,
         });
-
 
         const pagoGuardado = await pagoRepository.save(nuevoPago);
 
@@ -43,7 +47,7 @@ export async function getPagosService() {
         const pagoRepository = AppDataSource.getRepository(PagoSchema);
 
         const pagos = await pagoRepository.find({
-            relation: ["user"],
+            relations: ["user"],
             order: { fechaPago: "DESC" },
         });
 
@@ -60,7 +64,10 @@ export async function getPagoService({ idPago }) {
     try {
         const pagoRepository = AppDataSource.getRepository(PagoSchema);
 
-        const pago = await pagoRepository.findOneBy({ idPago: idPago });
+        const pago = await pagoRepository.findOne({
+            where: { idPago },
+            relations: ["user"],
+        });
 
         if (!pago) return [null, "Pago no encontrado"];
 
@@ -75,7 +82,10 @@ export async function deletePagoService({ idPago }) {
     try {
         const pagoRepository = AppDataSource.getRepository(PagoSchema);
 
-        const pago = await pagoRepository.findOneBy({ idPago: idPago });
+        const pago = await pagoRepository.findOne({
+            where: { idPago },
+            relations: ["user"],
+        });
 
         if (!pago) return [null, "Pago no encontrado"];
 
