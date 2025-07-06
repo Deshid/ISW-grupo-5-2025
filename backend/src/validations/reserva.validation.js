@@ -2,16 +2,16 @@
 import Joi from "joi";
 
 export const reservaValidation = Joi.object({
-    id: Joi.number()
-        .integer()
-        .positive()
-        .required()
-        .messages({
-            "number.base": "El id debe ser un número.",
-            "number.integer": "El id debe ser un número entero.",
-            "number.positive": "El id debe ser un número positivo.",
-            "any.required": "El id es obligatorio."
-        }),
+    // id: Joi.number()
+    //     .integer()
+    //     .positive()
+    //     .required()
+    //     .messages({
+    //         "number.base": "El id debe ser un número.",
+    //         "number.integer": "El id debe ser un número entero.",
+    //         "number.positive": "El id debe ser un número positivo.",
+    //         "any.required": "El id es obligatorio."
+    // }),
     id_espacio: Joi.number()
         .integer()
         .positive()
@@ -43,4 +43,4 @@ export const reservaValidation = Joi.object({
             "string.pattern.base": "La hora de término debe tener formato HH:mm.",
             "any.required": "La hora de término es obligatoria.",
         }),
-})
+}).unknown(true);

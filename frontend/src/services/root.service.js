@@ -10,7 +10,8 @@ const instance = axios.create({
   },
   withCredentials: true,
 });
-
+// guarda el token automaticamente en las peticiones
+// para que no se tenga que enviar manualmente en cada peticion
 instance.interceptors.request.use(
   (config) => {
     const token = cookies.get('jwt-auth', { path: '/' });

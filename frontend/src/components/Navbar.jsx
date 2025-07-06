@@ -72,7 +72,23 @@ const Navbar = () => {
                         </NavLink>
                     </li>
                     )}
+{/*inicio reservas*/}  
                     <li>
+                        <NavLink 
+                            to="/reservas" 
+                            onClick={() => { 
+                                setMenuOpen(false); 
+                                addActiveClass();
+                            }} 
+                            activeClassName="active"
+                        >
+                            Reservas
+                        </NavLink>
+                    </li>
+{/*fin reservas*/}  
+{/*inicio sancionar*/}  
+{/*fin sancionar*/}  
+                    <li> 
                         <NavLink 
                             to="/auth" 
                             onClick={() => { 
