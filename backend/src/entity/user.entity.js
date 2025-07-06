@@ -34,7 +34,7 @@ const UserSchema = new EntitySchema({
     },
     departamento:{
       type: "varchar",
-      nullable: true, //momentaneo mientras resuelvo el bug
+      nullable: true, 
     },
     whatsapp:{
       type: "int",
