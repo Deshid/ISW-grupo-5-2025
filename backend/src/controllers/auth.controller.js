@@ -9,6 +9,7 @@ import {
   handleErrorServer,
   handleSuccess,
 } from "../handlers/responseHandlers.js";
+import { AppDataSource } from "../config/configDb.js";
 
 export async function login(req, res) {
   try {

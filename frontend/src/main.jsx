@@ -8,8 +8,8 @@ import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
-
 import Reservas from '@components/ReservaForm';
+import Reclamos from "./pages/Reclamos"; // o la ruta correcta
 
 const router = createBrowserRouter([
   {
@@ -29,6 +29,10 @@ const router = createBrowserRouter([
         </ProtectedRoute>
         ),
     },
+    {
+      path: '/reclamos',
+      element: <Reclamos/>
+    }
     ]
     // rutas autorizadas para todos los usuarios autenticados
   },
@@ -43,6 +47,7 @@ const router = createBrowserRouter([
   {  path: '/reservas',
     element: <Reservas/>
   },
+  
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(

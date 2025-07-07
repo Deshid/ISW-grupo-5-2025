@@ -16,6 +16,7 @@ export async function loginService(user) {
     });
 
     const userFound = await userRepository.findOne({
+      
       where: { email }
     });
 
