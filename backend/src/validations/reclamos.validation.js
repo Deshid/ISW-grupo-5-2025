@@ -2,7 +2,7 @@ import Joi from "joi";
 
 const categoriasValidas = ["servicio", "edificio", "residente"];
 
-export const cancelacionReclamoValidation = Joi.object({
+export const cancelarReclamoValidation = Joi.object({
     motivo: Joi.string()
         .trim()
         .min(10)

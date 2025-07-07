@@ -7,28 +7,13 @@ import {
     handleErrorServer, 
     handleSuccess 
     } from "../handlers/responseHandlers.js";
-import { 
-    cancelacionReclamoValidation,
-    crearReclamoValidation,
-    getAllReclamosValidation, // Usaremos esta validación para paginación en identidades
-    getMisReclamosValidation,
-    getReclamosConIdentidadValidation,
-    getReclamosPendientesValidation,
-    updateEstadoReclamoValidation 
-    } from "../validations/reclamos.validation.js";
-import { formatoFecha } from "../helpers/dateFormat.js"
+
+import { formatoFecha } from "../helpers/dateFormat.helper.js"
+import { sendMail } from "../helpers/email.helper.js";
 
 export async function crearReclamo(req, res) {
     try {
-        const { error } = crearReclamoValidation.validate(req.body);
-        if (error) {
-            return handleErrorClient(res, 400, "Error de validación", error.message);
-        }
         const { descripcion, categoria, anonimo } = req.body;
-        
-        if (!descripcion || !categoria) {
-            return handleErrorClient(res, 400, "Tanto la descripción como la categoría son obligatorias");
-        }
 
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
 
@@ -37,31 +22,39 @@ export async function crearReclamo(req, res) {
             categoria,
             anonimo: !!anonimo,
             estado: "pendiente",
-            usuario: { id: req.user.id }
+            user: { id: req.user.id }
         });
 
         await reclamoRepository.save(nuevoReclamo);
+
+        // Enviar correo de confirmación al usuario
+        if (req.user && req.user.email) {
+            const asunto = "Reclamo recibido";
+            const texto = `Hola ${req.user.nombreCompleto},
+            Tu reclamo ha sido recibido y está pendiente de revisión.
+            \nDescripción: ${descripcion}
+            \nCategoría: ${categoria}
+            \nGracias por comunicarte.`;
+            await sendMail(req.user.email, asunto, texto);
+        }
+
+
         handleSuccess(res, 201, "Reclamo creado exitosamente", nuevoReclamo);
     } 
     catch (error) {
         handleErrorServer(res, 500, error.message);
-        return;
     }   
 }
 
 export async function getAllReclamos(req, res) {
     try {
-        const { error } = getAllReclamosValidation.validate(req.query);
-        if (error) {
-            return handleErrorClient(res, 400, "Error de validación", error.message);
-        }
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const esAdmin = req.user.rol === "administrador";
         const [reclamos, total] = await reclamoRepository.findAndCount({
-            relations: ["usuario"],
+            relations: ["user"],
             skip,
             take: limit
         });
@@ -71,12 +64,12 @@ export async function getAllReclamos(req, res) {
                 fecha: formatoFecha(r.fecha)
             };
             if (r.anonimo && !esAdmin) {
-                return { ...reclamoFormateado, usuario: null };
+                return { ...reclamoFormateado, user: null };
             }
             return reclamoFormateado;
         });
         return handleSuccess(res, 200, "Reclamos encontrados", {
-            reclamos: reclamosFiltrados, // como ya tienes
+            reclamos: reclamosFiltrados,
             page,
             limit,
             total,
@@ -91,7 +84,7 @@ export async function getReclamo(req, res) {
     try {
         const { id } = req.params;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
-        const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["usuario"] });
+        const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["user"] });
         if (!reclamo) {
             return handleErrorClient(res, 404, "Reclamo no encontrado");
         }
@@ -104,17 +97,14 @@ export async function getReclamo(req, res) {
 export async function updateEstadoReclamo(req, res) {
     try {
         const { id } = req.params;
-        const { error } = updateEstadoReclamoValidation.validate(req.body);
-        if (error) {
-            return handleErrorClient(res, 400, "Error de validación", error.message);
-        }
-        const { estado } = req.body;
+        const { estado, comentarioInterno } = req.body;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
-        const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) } });
+        // Buscar con la relación usuario para obtener el email
+        const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["user"] });
         if (!reclamo) {
             return handleErrorClient(res, 404, "Reclamo no encontrado");
         }
-        // Lógica de transición de estados
+        
         if (reclamo.estado === "cancelado") {
             return handleErrorClient(res, 400, "No se puede modificar un reclamo cancelado.");
         }
@@ -132,6 +122,17 @@ export async function updateEstadoReclamo(req, res) {
         }
         reclamo.estado = estado;
         await reclamoRepository.save(reclamo);
+
+        // Enviar notificación por correo
+        if (reclamo.user && reclamo.user.email) {
+            const asunto = `Actualización de estado de tu reclamo sobre ${reclamo.categoria} (ID: ${reclamo.id})`;
+            const texto = `Hola ${reclamo.user.nombreCompleto},
+            \n\nEl estado de tu reclamo ha sido actualizado a: ${estado}.\n` 
+            +(comentarioInterno ? `Comentario: ${comentarioInterno}\n` : "") 
+            + (estado === "resuelto" ? `Resolución: ${comentarioInterno}\n` : "") 
+            + "\nSi tienes dudas, contacta a la administración.";
+            await sendMail(reclamo.user.email, asunto, texto);
+        }
         return handleSuccess(res, 200, "Estado del reclamo actualizado", reclamo);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
@@ -140,17 +141,13 @@ export async function updateEstadoReclamo(req, res) {
 
 export async function getMisReclamos(req, res) {
     try {
-        const { error } = getMisReclamosValidation.validate(req.query);
-        if (error) {
-            return handleErrorClient(res, 400, "Error de validación", error.message);
-        }
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const [reclamos, total] = await reclamoRepository.findAndCount({
-            where: { usuario: { id: req.user.id } },
-            relations: ["usuario"],
+            where: { user: { id: req.user.id } },
+            relations: ["user"],
             skip,
             take: limit
         });
@@ -176,24 +173,31 @@ export async function getMisReclamos(req, res) {
 export async function cancelarReclamo(req, res) {
     try {
         const { id } = req.params;
-        const { error } = cancelacionReclamoValidation.validate(req.body);
-        if (error) {
-            return handleErrorClient(res, 400, "Error de validación", error.message);
-        }
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
-        const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["usuario"] });
+        const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["user"] });
         if (!reclamo) {
             return handleErrorClient(res, 404, "Reclamo no encontrado");
         }
         if (reclamo.estado !== "pendiente") {
             return handleErrorClient(res, 400, "Solo se pueden cancelar reclamos pendientes");
         }
-        if (reclamo.usuario?.id !== req.user.id) {
+        if (reclamo.user?.id !== req.user.id) {
             return handleErrorClient(res, 403, "No puedes cancelar un reclamo que no es tuyo");
         }
         reclamo.estado = "cancelado";
         reclamo.comentarioInterno = req.body.motivo;
         await reclamoRepository.save(reclamo);
+
+        // Enviar notificación por correo
+        if (reclamo.user && reclamo.user.email) {
+            const asunto = "Tu reclamo ha sido cancelado";
+            const texto = `Hola ${reclamo.user.nombreCompleto},
+            \n\nTu reclamo acerca de ${reclamo.categoria} ha sido cancelado.
+            \nTu motivo: ${req.body.motivo}\n\n
+            Si tienes dudas, contacta a la administración.`;
+            // Cambia a la función correcta según tu helper
+            await sendMail(reclamo.user.email, asunto, texto);
+        }
         return handleSuccess(res, 200, "Reclamo cancelado exitosamente", reclamo);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
@@ -202,10 +206,6 @@ export async function cancelarReclamo(req, res) {
 
 export async function getReclamosPendientes(req, res) {
     try {
-        const { error } = getReclamosPendientesValidation.validate(req.query);
-        if (error) {
-            return handleErrorClient(res, 400, "Error de validación", error.message);
-        }
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
@@ -216,7 +216,7 @@ export async function getReclamosPendientes(req, res) {
             { estado: "pendiente" },
             { estado: "en_proceso" }
             ],
-            relations: ["usuario"],
+            relations: ["user"],
             skip,
             take: limit
         });
@@ -237,17 +237,12 @@ export async function getReclamosPendientes(req, res) {
 
 export async function getReclamosConIdentidad(req, res) {
     try {
-        // Usar validación de paginación
-        const { error } = getReclamosConIdentidadValidation.validate(req.query);
-        if (error) {
-            return handleErrorClient(res, 400, "Error de validación", error.message);
-        }
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const [reclamos, total] = await reclamoRepository.findAndCount({
-            relations: ["usuario"],
+            relations: ["user"],
             skip,
             take: limit
         });

@@ -47,7 +47,7 @@ const ReclamoSchema = new EntitySchema({
         },
     },
     relations: {
-        usuario: {
+        user: {
             type: "many-to-one",
             target: "User",
             joinColumn: true,
