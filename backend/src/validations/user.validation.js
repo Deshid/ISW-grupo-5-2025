@@ -80,6 +80,40 @@ export const userBodyValidation = Joi.object({
         "El correo electrónico debe tener como máximo 35 caracteres.",
     })
     .custom(domainEmailValidator, "Validación dominio email"),
+  departamento: Joi.string()
+    .min(3)
+    .max(50)
+    .messages({
+      "string.empty": "El departamento no puede estar vacío.",
+      "string.base": "El departamento debe ser de tipo string.",
+      "string.min": "El departamento debe tener como mínimo 3 caracteres.",
+      "string.max": "El departamento debe tener como máximo 50 caracteres.",
+    }),
+    telefono: Joi.string()
+        .min(9)
+        .max(10)
+        .pattern(new RegExp(/^\d{9,10}$/))
+        .required()
+        .messages({
+            "string.empty": "El número de teléfono no puede estar vacío.",
+            "any.required": "El número de teléfono es obligatorio",
+            "string.base": "El número de teléfono debe ser de tipo string.",
+            "string.min": "El número de teléfono debe tener como mínimo 9 caracteres.",
+            "string.max": "El número de teléfono debe tener como máximo 10 caracteres",
+            "string.pattern.base": "El número de teléfono debe contener solo dígitos.",
+        }),
+      whatsapp: Joi.string()
+    .min(9)
+    .max(10)
+    .pattern(new RegExp(/^\d{9,10}$/))
+    .allow("")
+    .messages({
+      "string.empty": "El número de WhatsApp no puede estar vacío.",
+      "string.base": "El número de WhatsApp debe ser de tipo string.",
+      "string.min": "El número de WhatsApp debe tener como mínimo 9 caracteres.",
+      "string.max": "El número de WhatsApp debe tener como máximo 10 caracteres.",
+      "string.pattern.base": "El número de WhatsApp debe contener solo dígitos.",
+    }),
   password: Joi.string()
     .min(8)
     .max(26)

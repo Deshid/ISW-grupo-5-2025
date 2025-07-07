@@ -1,0 +1,92 @@
+/* Fondo general */
+body {
+    background-image: url('https://static.vecteezy.com/system/resources/previews/006/993/472/non_2x/park-landscape-scene-illustration-nature-with-buildings-trees-clouds-and-sky-public-park-with-path-in-urban-vector.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+/* Contenedor del formulario */
+.form-reserva {
+    font-family: 'Arial', sans-serif;
+    color: #2e4c48;
+    background-color: #fae3b8;
+    padding: 40px 30px;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    margin: 40px auto;
+    gap: 18px;
+}
+
+/* Labels */
+.form-reserva label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: #2e4c48;
+}
+
+/* Inputs y selects */
+.form-reserva input,
+.form-reserva select {
+    border: 2px solid #ca8f7d;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 16px;
+    background-color: #ffffff;
+    color: #2e4c48;
+    margin-top: 4px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-reserva input:focus,
+.form-reserva select:focus {
+    outline: none;
+    border-color: #607396;
+    background-color: #f3f0de;
+}   
+
+/* Botón */
+.form-reserva button {
+    background-color: #119970;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.form-reserva button:hover {
+    background-color: #0e7d5f;
+    transform: scale(1.02);
+}
+
+/* Mensaje de éxito o error */
+.form-reserva .mensaje {
+    margin-top: 10px;
+    font-size: 15px;
+    color: #5a7d5a;
+    text-align: center;
+}
+
+/* Responsive (adaptación a diferentes tamaños de pantalla) */
+@media (max-width: 600px) {
+    .form-reserva {
+        padding: 20px 10px;
+        max-width: 95vw;
+    }
+}
