@@ -53,7 +53,7 @@ const Navbar = () => {
                                 setMenuOpen(false); 
                                 addActiveClass();
                             }} 
-                            activeClassName="active"
+                            className={({ isActive }) => isActive ? "active" : undefined}
                         >
                             Inicio
                         </NavLink>
@@ -66,7 +66,7 @@ const Navbar = () => {
                                 setMenuOpen(false); 
                                 addActiveClass();
                             }} 
-                            activeClassName="active"
+                            className={({ isActive }) => isActive ? "active" : undefined}
                         >
                             Usuarios
                         </NavLink>
@@ -80,12 +80,24 @@ const Navbar = () => {
                                 setMenuOpen(false); 
                                 addActiveClass();
                             }} 
-                            activeClassName="active"
+                            className={({ isActive }) => isActive ? "active" : undefined}
                         >
                             Reservas
                         </NavLink>
                     </li>
 {/*fin reservas*/}  
+                    <li>
+                        <NavLink 
+                            to="/reclamos" 
+                            onClick={() => { 
+                                setMenuOpen(false); 
+                                addActiveClass();
+                            }} 
+                            className={({ isActive }) => isActive ? "active" : undefined}
+                        >
+                            Reclamos
+                        </NavLink>
+                    </li>
 {/*inicio sancionar*/}  
 {/*fin sancionar*/}  
                     <li> 
@@ -95,11 +107,12 @@ const Navbar = () => {
                                 logoutSubmit(); 
                                 setMenuOpen(false); 
                             }} 
-                            activeClassName="active"
+                            className={({ isActive }) => isActive ? "active" : undefined}
                         >
                             Cerrar sesión
                         </NavLink>
                     </li>
+
                 </ul>
             </div>
             <div className="hamburger" onClick={toggleMenu}>

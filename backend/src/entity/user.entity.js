@@ -41,11 +41,11 @@ const UserSchema = new EntitySchema({
     telefono: {
       type: "varchar",
       length: 10,
-      nullable: false,
+      nullable: true,
     },
     whatsapp: {
       type: "int",
-      nullable: false,
+      nullable: true,
     },
     password: {
       type: "varchar",
