@@ -15,6 +15,7 @@ import { createEspaciosComunes, createUsers } from "./config/initialSetup.js";
 import reservaRoutes from "./routes/reserva.routes.js";
 import sancionRoutes from "./routes/sancion.routes.js";
 import espacioRoutes from "./routes/reserva.routes.js";
+import pagoRoutes from "./routes/pago.routes.js";
 
 async function setupServer() {
   try {
@@ -66,6 +67,7 @@ async function setupServer() {
     app.use("/api/reservas", reservaRoutes);
     app.use("/api/usuarios", sancionRoutes);
     app.use("/api/espacios", espacioRoutes);
+    app.use("/api/pago", pagoRoutes);
     
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);
