@@ -1,8 +1,8 @@
 "use strict";
-import Pago from "../entity/pago.entity.js";
 import UserSchema from "../entity/user.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import PagoSchema from "../entity/pago.entity.js";
+import { generarComprobantePago } from "./pdf.services.js";
 
 export async function createPagoService(data) {
     try {
@@ -35,7 +35,9 @@ export async function createPagoService(data) {
 
         const pagoGuardado = await pagoRepository.save(nuevoPago);
 
-        return [pagoGuardado, null];
+        // Generar PDF
+        const pdfBuffer = await generarComprobantePago(pagoGuardado);
+        return [{ pago: pagoGuardado, pdfBuffer }, null];
     } catch (error) {
         console.error("Error al crear el pago:", error);
         return [null, "Error interno del servidor"];
