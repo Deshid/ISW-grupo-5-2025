@@ -39,11 +39,13 @@ const Users = () => {
     { title: "Correo electrónico", field: "email", width: 300, responsive: 3 },
     { title: "Rut", field: "rut", width: 150, responsive: 2 },
     { title: "Rol", field: "rol", width: 200, responsive: 2 },
-    { title: "Creado", field: "createdAt", width: 200, responsive: 2 }
+    { title: "Creado", field: "createdAt", width: 200, responsive: 2 },
+    { title: "Estado", field: "estado", width: 150, responsive: 0 },
+    { title: "Acción", field: "action", width: 100, responsive: 0 }
   ];
 
   return (
-    <div className='main-container'>
+    <div className='main-container-user'>
       <div className='table-container'>
         <div className='top-table'>
           <h1 className='title-table'>Usuarios</h1>
