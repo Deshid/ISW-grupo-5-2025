@@ -32,7 +32,11 @@ const router = createBrowserRouter([
     {
       path: '/reclamos',
       element: <Reclamos/>
-    }
+    },
+      {  
+        path: '/reservas',
+        element: <Reservas/>
+  },
     ]
     // rutas autorizadas para todos los usuarios autenticados
   },
@@ -43,11 +47,7 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register/>
-  },
-  {  path: '/reservas',
-    element: <Reservas/>
-  },
-  
+  }, 
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
