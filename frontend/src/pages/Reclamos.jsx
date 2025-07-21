@@ -1,37 +1,26 @@
-import ReclamoForm from "../components/ReclamoForm";
-import axios from "axios";
 import { useState } from "react";
-import { Button, Snackbar, Alert, Typography, Box } from "@mui/material";
+import "../styles/reclamos.css";
+//import axios from "axios";
+import ReclamoForm from "../components/ReclamoForm";
 
 export default function Reclamos() {
-    const [open, setOpen] = useState(false);
-    const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-
-    const handleSubmit = async (form) => {
-        try {
-        // Reemplaza 'TU_TOKEN' por la obtención real del token (ej: desde contexto o localStorage)
-        const token = localStorage.getItem("token");
-        await axios.post("/api/reclamos", form, { headers: { Authorization: `Bearer ${token}` } });
-        setSnackbar({ open: true, message: "Reclamo creado con éxito", severity: "success" });
-        setOpen(false);
-        } catch (err) {
-        setSnackbar({ open: true, message: err?.response?.data?.message || "Error al crear reclamo", severity: "error" });
-        }
-    };
+    const [opcion, setOpcion] = useState(null);
 
     return (
-        <Box sx={{ mt: 12, p: 2 }}>
-        <Typography variant="h4" gutterBottom>Gestión de Reclamos</Typography>
-        <Button variant="contained" onClick={handleOpen}>Nuevo Reclamo</Button>
-        <ReclamoForm open={open} onClose={handleClose} onSubmit={handleSubmit} />
-        <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-            <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
-            {snackbar.message}
-            </Alert>
-        </Snackbar>
-        </Box>
+    <div className = "containerReclamos">
+
+        <h2>Gestión de Reclamos</h2>
+        <div className = "containerCuerpo">
+            <div className = "containerReclamos-btns">
+                <li><button onClick={() => setOpcion("crear")}>Crear Reclamo</button></li>
+                <li><button onClick={() => setOpcion("pendientes")}>Reclamos Pendientes</button></li>
+                <li><button onClick={() => setOpcion("misReclamos")}>Mis Reclamos</button></li>
+            </div>
+
+        {opcion === "crear" && <div className="formularioReclamo"><ReclamoForm /></div>}
+        {opcion === "pendientes" && <div className="formularioReclamo">Aquí va la lista de reclamos pendientes</div>}
+        {opcion === "misReclamos" && <div className="formularioReclamo">Aquí va la lista de mis reclamos</div>}
+        </div>
+    </div>
     );
-    }
+}
