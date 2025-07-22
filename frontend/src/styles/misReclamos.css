@@ -27,3 +27,27 @@
     background-color: #f1dada;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
+
+.eliminar-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.eliminar-btn {
+    display: flex;
+    align-self: flex-end;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 4px;
+}
+
+.eliminar-btn:hover img {
+    filter: brightness(0.7) drop-shadow(0 0 2px #d33);
+    transition: filter 0.2s;
+}
+
+.hora {
+    margin: 0;
+}
