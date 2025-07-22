@@ -56,6 +56,7 @@ body {
     align-self: flex-end;
     margin-top: auto;
 }
+
 .no-reservas {
     font-size: 18px;
     color: #4f92a7;
@@ -144,7 +145,7 @@ body {
 /* Inputs y selects */
 .form-reserva input,
 .form-reserva select {
-    border: 2px solid #97a5e5;
+    border: 2px solid #b3bce7;
     border-radius: 10px;
     padding: 8px 10px;
     font-size: 16px;
@@ -239,6 +240,16 @@ body {
 .estado-aprobada {
     background: #d4f7dc;
     color: #119970;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 5px; 
+}
+
+.estado-rechazada {
+    background: #fdd6d6;
+    color: #e74c3c;
     font-weight: bold;
     border-radius: 6px;
     padding: 4px 10px;
