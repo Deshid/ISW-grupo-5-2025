@@ -1,7 +1,8 @@
 import { useState } from "react";
 import "../styles/reclamos.css";
-//import axios from "axios";
 import ReclamoForm from "../components/ReclamoForm";
+import MisReclamos from "../components/MisReclamos";
+
 
 export default function Reclamos() {
     const [opcion, setOpcion] = useState(null);
@@ -19,7 +20,7 @@ export default function Reclamos() {
 
         {opcion === "crear" && <div className="formularioReclamo"><ReclamoForm /></div>}
         {opcion === "pendientes" && <div className="formularioReclamo">Aquí va la lista de reclamos pendientes</div>}
-        {opcion === "misReclamos" && <div className="formularioReclamo">Aquí va la lista de mis reclamos</div>}
+        {opcion === "misReclamos" && <div className="formularioReclamo"><MisReclamos /></div>}
         </div>
     </div>
     );
