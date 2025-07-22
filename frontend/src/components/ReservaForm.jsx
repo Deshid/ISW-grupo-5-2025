@@ -100,7 +100,7 @@ export default function VistaReserva() {
                                 </span>
                             )}
                             {/* Cancel button */}
-                            {["pendiente", "aprobada"].includes(r.estado) && (
+                            {["pendiente", "aprobada", "rechazada"].includes(r.estado) && (
                                 <button
                                     className="btn-warning"
                                     onClick={async () => {
