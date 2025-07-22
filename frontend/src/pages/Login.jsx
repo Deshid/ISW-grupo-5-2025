@@ -42,7 +42,7 @@ const Login = () => {
                         maxLength: 30,
                         errorMessageData: errorEmail,
                         validate: {
-                            emailDomain: (value) => value.endsWith('@gmail.cl') || 'El correo debe terminar en @gmail.cl'
+                            emailDomain: (value) => value.endsWith('@gmail.cl') || value.endsWith('@gmail.com') || 'El correo debe terminar en @gmail.cl o @gmail.com'
                         },
                         onChange: (e) => handleInputChange('email', e.target.value),
                     },
