@@ -67,7 +67,7 @@ async function setupServer() {
     app.use("/api/reservas", reservaRoutes);
     app.use("/api/usuarios", sancionRoutes);
     app.use("/api/espacios", espacioRoutes);
-    app.use("/api/pago", pagoRoutes);
+    app.use("/api/pagos", pagoRoutes);
     
     app.listen(PORT, () => {
       console.log(`=> Servidor corriendo en ${HOST}:${PORT}/api`);

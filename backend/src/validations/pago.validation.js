@@ -31,7 +31,8 @@ export const pagoBodyValidation = Joi.object({
             "any.required": "El monto es obligatorio.",
         }),
     mes: Joi.string()
-        .valid("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre") // Unificamos los .valid
+        .valid("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre") // Unificamos los .valid
         .required()
         .messages({
             "string.empty": "El mes no puede estar vacío.",
@@ -83,7 +84,8 @@ export const pagoBodyValidation = Joi.object({
     });
 
 // ... (pagoQueryValidation se mantiene igual)
-export const pagoQueryValidation = Joi.object({
+
+export const pagoParamsValidation = Joi.object({
     idPago: Joi.number()
         .integer()
         .positive()
@@ -94,9 +96,4 @@ export const pagoQueryValidation = Joi.object({
             "number.positive": "El ID del pago debe ser un número positivo.",
             "any.required": "El ID del pago es obligatorio.",
         }),
-})
-    .unknown(false) // No se permiten propiedades adicionales en la consulta.
-    .messages({
-        "object.unknown": "No se permiten propiedades adicionales.",
-        "object.missing": "Debes proporcionar el ID del pago.",
-    });
+});

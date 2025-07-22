@@ -9,7 +9,7 @@ import {
 
 import {
     pagoBodyValidation,
-    pagoQueryValidation,
+    pagoParamsValidation,
 } from "../validations/pago.validation.js";
 
 import {
@@ -17,6 +17,8 @@ import {
     handleErrorServer,
     handleSuccess,
 } from "../handlers/responseHandlers.js";
+
+import { generarComprobantePago } from "../services/pdf.services.js";
 
 export async function createPago(req, res) {
     try {
@@ -35,7 +37,7 @@ export async function createPago(req, res) {
             return handleErrorClient(
                 res,
                 403,
-                "solo el tesorero puede registrar un pago",
+                "Solo el tesorero puede registrar un pago",
             );
         }
 
@@ -44,22 +46,42 @@ export async function createPago(req, res) {
             return handleErrorClient(
                 res,
                 400,
-                "no se pudo registrar el pago",
+                "No se pudo registrar el pago",
                 pagoError,
             );
         }
 
-        // Devuelve el PDF directamente
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader(
-            "Content-Disposition",
-            "inline; filename=comprobante_pago.pdf",
-        );
-        return res.status(201).send(resultado.pdfBuffer);
+        const pago = resultado.pago;
+
+        const pagoLimpio = {
+            idPago: pago.idPago,
+            monto: pago.monto,
+            mes: pago.mes,
+            fechaPago: pago.fechaPago,
+            metodo: pago.metodo,
+            user: {
+                id: pago.user.id,
+                nombreCompleto: pago.user.nombreCompleto,
+                rut: pago.user.rut,
+                departamento: pago.user.departamento,
+                rol: pago.user.rol,
+            },
+        };
+
+        return res.status(201).json({
+            mensaje: "Pago registrado con éxito",
+            pago: pagoLimpio,
+            comprobanteUrl: `/api/pago/comprobante?idPago=${pago.idPago}`,
+        });
+
     } catch (error) {
         return handleErrorServer(res, 500, error.message);
     }
 }
+
+
+
+
 export async function getPagos(req, res) {
     try {
         const [pagos, errorPagos] = await getPagosService();
@@ -93,9 +115,10 @@ export async function getPago(req, res) {
 
 export async function deletePago(req, res) {
     try {
-        const { idPago } = req.query;
+        const { idPago } = req.params;
+        const { error } = pagoParamsValidation.validate({ idPago });
 
-        const { error } = pagoQueryValidation.validate({ idPago });
+
         if (error) {
             return handleErrorClient(res, 400, "datos invalidos", error.message);
         }
