@@ -30,16 +30,3 @@ export async function deleteUser(rut) {
         return error.response.data;
     }
 }
-
-export async function sancionarUsuario(rut, motivo) {
-    try {
-        const response = await axios.post(`/user/sancionar/?rut=${rut}`, { motivo });
-        return response.data;
-    } catch (error) {
-        return error.response.data;
-    }
-}
-
-// suspender sancion
-
-// obtener sanciones
