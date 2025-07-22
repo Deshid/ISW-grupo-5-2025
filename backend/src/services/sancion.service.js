@@ -80,3 +80,20 @@ export async function obtenerSancionesServicio() {
     if (!sanciones || sanciones.length === 0) return [null, "No hay sanciones registradas"];
     return [sanciones, null];
 }
+
+export async function obtenerSancionesActivasServicio() {
+    const sancionRepository = AppDataSource.getRepository(SancionSchema);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const sancionesActivas = await sancionRepository.find({
+        where: {
+            fecha_inicio: LessThanOrEqual(hoy),
+            fecha_fin: MoreThanOrEqual(hoy)
+        },
+        relations: ["usuario"]
+    });
+    if (!sancionesActivas || sancionesActivas.length === 0) {
+        return { sanciones: [], mensaje: "No hay sanciones activas" };
+    }
+    return { sanciones: sancionesActivas, mensaje: null };
+}
