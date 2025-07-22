@@ -1,5 +1,6 @@
 "use strict";
 
+
 import { Router } from "express";
 import {
     createPago,
@@ -11,10 +12,14 @@ import {
 import { authenticateJwt } from "../middlewares/authentication.middleware.js";
 import { isTesorero } from "../middlewares/authorization.middleware.js";
 
+//
+import { descargarComprobante } from "../controllers/pago.controller.js";
+import { generarComprobantePago } from "../services/pdf.services.js";
 
 const router = Router();
 
 router.post("/", authenticateJwt, isTesorero, createPago);
+router.get("/comprobante", descargarComprobante);
 router.get("/", authenticateJwt, isTesorero, getPagos);
 router.get("/:idPago", authenticateJwt, isTesorero, getPago);
 router.delete("/:idPago", authenticateJwt, isTesorero, deletePago);

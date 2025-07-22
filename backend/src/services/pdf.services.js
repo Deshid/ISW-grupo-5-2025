@@ -35,3 +35,37 @@ export async function exportReclamosToPDF(data, path) {
         stream.on("error", reject);
     });
 }
+
+// GENERADOR DE PDF PARA ENTIDAD PAGO
+
+export function generarComprobantePago(pago) {
+    return new Promise((resolve, reject) => {
+        try {
+            const doc = new PDFDocument();
+            const chunks = [];
+
+            doc.on("data", (chunk) => chunks.push(chunk));
+            doc.on("end", () => {
+                const result = Buffer.concat(chunks);
+                resolve(result);
+            });
+
+            // Contenido del PDF
+            doc.fontSize(20).text("Comprobante de Pago", { align: "center" });
+            doc.moveDown();
+
+            doc.fontSize(12).text(`Pago ID: ${pago.idPago}`);
+            doc.text(`Nombre: ${pago.user.nombreCompleto}`);
+            doc.text(`RUT: ${pago.user.rut}`);
+            doc.text(`Departamento: ${pago.user.departamento || "No especificado"}`);
+            doc.text(`Monto: $${pago.monto}`);
+            doc.text(`Mes: ${pago.mes}`);
+            doc.text(`Fecha de pago: ${new Date(pago.fechaPago).toLocaleString()}`);
+            doc.text(`Método: ${pago.metodo}`);
+
+            doc.end();
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
