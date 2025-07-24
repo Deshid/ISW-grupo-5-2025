@@ -14,7 +14,6 @@ import { sendMail } from "../helpers/email.helper.js";
 export async function crearReclamo(req, res) {
     try {
         const { descripcion, categoria, anonimo } = req.body;
-
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
 
         const nuevoReclamo = reclamoRepository.create({
@@ -51,17 +50,23 @@ export async function getAllReclamos(req, res) {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
+        const order = req.query.order === "asc" ? "ASC" : "DESC";
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const esAdmin = req.user.rol === "administrador";
         const [reclamos, total] = await reclamoRepository.findAndCount({
             relations: ["user"],
             skip,
-            take: limit
+            take: limit,
+            order: { fecha: order }
         });
         const reclamosFiltrados = reclamos.map(r => {
             const reclamoFormateado = {
                 ...r,
-                fecha: formatoFecha(r.fecha)
+                user: r.user ? {
+                    nombreCompleto: r.user.nombreCompleto,
+                    email: r.user.email,
+                    rut: r.user.rut
+                } : null
             };
             if (r.anonimo && !esAdmin) {
                 return { ...reclamoFormateado, user: null };
