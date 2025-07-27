@@ -87,7 +87,7 @@ async function createUsers() {
         userRepository.create({
           nombreCompleto: "Juan Pablo Rosas Martin",
           rut: "20.738.415-1",
-          email: "usuario6.2024@gmail.cl",
+          email: "catpinares@gmail.com",//"usuario6.2024@gmail.cl",
           telefono: "987654321",
           whatsapp: "987654321",
           departamento: "Departamento 105",
