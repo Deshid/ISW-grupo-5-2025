@@ -95,6 +95,18 @@ async function createUsers() {
           rol: "usuario",
         }),
       ),
+      userRepository.save(
+        userRepository.create({
+          nombreCompleto: "Paula Angélica Labra Soto",
+          rut: "11.111.111-1",
+          email: "paulalabra18@gmail.com",
+          telefono: "987654321",
+          whatsapp: "987654321",
+          departamento: "Departamento 106",
+          password: await encryptPassword("user1234"),
+          rol: "usuario",
+        }),
+      ),
     ]);
     console.log("* => Usuarios creados exitosamente");
   } catch (error) {
