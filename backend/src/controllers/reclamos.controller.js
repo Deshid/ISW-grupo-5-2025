@@ -109,6 +109,8 @@ export async function getReclamo(req, res) {
             }
             : null;
 
+        const reclamoFormateado = {
+            id: reclamo.id,
             fecha: fechaFormateada,
             descripcion: reclamo.descripcion,
             categoria: reclamo.categoria,
