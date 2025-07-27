@@ -14,25 +14,20 @@ const rutValidator = Joi.string()
     });
 
 export const pagoBodyValidation = Joi.object({
-    // --- Identificación del Residente (Requiere RUT O Departamento) ---
-    // Usamos Joi.alternatives() para asegurar que al menos uno de los dos campos esté presente.
-    // Los campos 'nombreCompleto', 'rut', 'departamento' ya NO son 'required()' aquí.
-    // Se convierten en 'opcionales' en el objeto principal, pero la alternativa los hace obligatorios de forma condicional.
 
-    // Campos del pago
     monto: Joi.number()
-        .precision(2) // Permite hasta 2 decimales para el monto (ej. 120.50)
+        .precision(2)
         .positive()
         .required()
         .messages({
             "number.base": "El monto debe ser un número.",
-            "number.precision": "El monto no debe tener más de 2 decimales.", // Mensaje para precisión
+            "number.precision": "El monto no debe tener más de 2 decimales.",
             "number.positive": "El monto debe ser un número positivo.",
             "any.required": "El monto es obligatorio.",
         }),
     mes: Joi.string()
-        .valid("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
-            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre") // Unificamos los .valid
+        .valid("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
         .required()
         .messages({
             "string.empty": "El mes no puede estar vacío.",
@@ -40,15 +35,15 @@ export const pagoBodyValidation = Joi.object({
             "any.only": "El mes proporcionado no es válido. Debe ser uno de los meses del año.",
         }),
     fechaPago: Joi.date()
-        .iso() // Espera formato ISO 8601 (ej. "2025-05-25" o "2025-05-25T10:30:00Z")
-        .default(() => new Date()) // Si no se proporciona, usa la fecha y hora actual
+        .iso()
+        .default(() => new Date())
         .messages({
             "date.base": "La fecha de pago debe ser una fecha válida.",
             "date.iso": "La fecha de pago debe estar en formato ISO (YYYY-MM-DD o YYYY-MM-DDTHH:mm:ssZ).",
         }),
     metodo: Joi.string()
-        .valid("Efectivo", "Transferencia", "Tarjeta de Crédito", 
-            "Débito Automático", "Cheque") // Añade más métodos si es necesario
+        .valid("Efectivo", "Transferencia", "Tarjeta de Crédito",
+            "Débito Automático", "Cheque")
         .required()
         .messages({
             "string.empty": "El método de pago no puede estar vacío.",
@@ -56,16 +51,15 @@ export const pagoBodyValidation = Joi.object({
             "any.only": "El método de pago debe ser 'Efectivo', 'Transferencia', etc.",
         }),
 })
-    // Aquí definimos la lógica condicional para RUT o Departamento
-    .xor("rut", "departamento") // Requiere EXCLUSIVAMENTE uno de 'rut' o 'departamento'
+
+    .xor("rut", "departamento")
     .messages({
         "object.xor": "Debe proporcionar exclusivamente el RUT o el Departamento",
-        "object.missing": "Debe proporcionar el RUT o el Departamento del residente.", // Mensaje más específico
+        "object.missing": "Debe proporcionar el RUT o el Departamento del residente.",
     })
-    // Definimos los esquemas para 'rut' y 'departamento' aquí, como opcionales en el objeto principal
-    // para que 'xor' pueda operar sobre ellos.
+
     .keys({
-        rut: rutValidator, // Usa el validador de RUT predefinido
+        rut: rutValidator,
         departamento: Joi.string()
             .min(2)
             .max(10)
@@ -76,16 +70,27 @@ export const pagoBodyValidation = Joi.object({
                 "string.max": "El número de departamento debe tener como máximo 10 caracteres.",
             }),
     })
-    .unknown(false) // No se permiten propiedades adicionales en el cuerpo de la solicitud de creación de pago.
+    .unknown(false)
     .messages({
         "object.unknown": "No se permiten propiedades adicionales.",
-        // El mensaje 'object.missing' para el pago entero ya no es necesario aquí
-        // porque 'object.xor' maneja la ausencia de RUT/Departamento.
+
     });
 
-// ... (pagoQueryValidation se mantiene igual)
 
 export const pagoParamsValidation = Joi.object({
+    idPago: Joi.number()
+        .integer()
+        .positive()
+        .required()
+        .messages({
+            "number.base": "El ID del pago debe ser un número.",
+            "number.integer": "El ID del pago debe ser un número entero.",
+            "number.positive": "El ID del pago debe ser un número positivo.",
+            "any.required": "El ID del pago es obligatorio.",
+        }),
+});
+
+export const pagoQueryValidation = Joi.object({
     idPago: Joi.number()
         .integer()
         .positive()

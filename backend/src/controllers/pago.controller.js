@@ -10,6 +10,7 @@ import {
 import {
     pagoBodyValidation,
     pagoParamsValidation,
+    pagoQueryValidation, 
 } from "../validations/pago.validation.js";
 
 import {
@@ -19,6 +20,7 @@ import {
 } from "../handlers/responseHandlers.js";
 
 import { generarComprobantePago } from "../services/pdf.services.js";
+import { sendEmail } from "../services/email.service.js"; 
 
 export async function createPago(req, res) {
     try {
@@ -65,21 +67,73 @@ export async function createPago(req, res) {
                 rut: pago.user.rut,
                 departamento: pago.user.departamento,
                 rol: pago.user.rol,
+                email: pago.user.email || "N/A", 
             },
         };
 
-        return res.status(201).json({
-            mensaje: "Pago registrado con éxito",
-            pago: pagoLimpio,
-            comprobanteUrl: `/api/pago/comprobante?idPago=${pago.idPago}`,
-        });
+        let emailInfo = null;
+        try {
+   
+            if (!pago.user || !pago.user.email) {
+                console.warn(`Advertencia: No se pudo enviar el 
+                    comprobante por correo. 
+                    El usuario ${pago.user?.nombreCompleto || "sin nombre"} (ID: ${pago.user?.id || "N/A"}) 
+                    no tiene una dirección de correo electrónico asociada.`);
+            } else {
+                const pdfBuffer = await generarComprobantePago(pago); // Genera el PDF como Buffer
+
+                const attachments = [
+                    {
+                        filename: `comprobante_pago_${pago.idPago}.pdf`,
+                        content: pdfBuffer,
+                        contentType: "application/pdf",
+                    },
+                ];
+
+                const emailSubject = `Comprobante de Pago de Gastos Comunes - ${pago.mes}`;
+                const emailText = `Estimado(a) ${pago.user.nombreCompleto},\n\nAdjunto encontrará el 
+                comprobante de su pago de gastos comunes 
+                correspondiente al mes de ${pago.mes}.\n\nSaludos cordiales,\nTesorería Condominios`;
+                const emailHtml = `
+                    <p>Estimado(a) ${pago.user.nombreCompleto},</p>
+                    <p>Adjunto encontrará el comprobante de su 
+                    pago de gastos comunes correspondiente al mes de <strong>${pago.mes}</strong>.</p>
+                    <p>Monto: <strong>$${pago.monto}</strong></p>
+                    <p>Gracias por su pago.</p>
+                    <p>Saludos cordiales,<br>Tesorería Condominios</p>
+                `;
+
+                emailInfo = await sendEmail(
+                    pago.user.email,
+                    emailSubject,
+                    emailText,
+                    emailHtml,
+                    attachments
+                );
+                console.log(`Comprobante enviado por correo a ${pago.user.email}. Info:`, emailInfo);
+            }
+        } catch (emailError) {
+            console.error("Error al enviar el comprobante por correo:", emailError);
+ 
+        }
+
+
+
+        return handleSuccess(
+            res,
+            201,
+            "Pago registrado con éxito y comprobante enviado por correo (si el email estaba disponible).",
+            {
+                pago: pagoLimpio,
+                comprobanteUrl: `/api/pago/comprobante?idPago=${pago.idPago}`,
+                emailInfo: emailInfo ? "Comprobante enviado" : "No se pudo enviar ",
+            },
+        );
 
     } catch (error) {
         return handleErrorServer(res, 500, error.message);
     }
 }
-
-
 
 
 export async function getPagos(req, res) {
@@ -99,6 +153,7 @@ export async function getPagos(req, res) {
 export async function getPago(req, res) {
     try {
         const { idPago } = req.query;
+       
         const { error } = pagoQueryValidation.validate({ idPago });
         if (error) {
             return handleErrorClient(res, 400, "Error la consulta", error.message);
