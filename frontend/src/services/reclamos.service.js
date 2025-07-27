@@ -1,6 +1,6 @@
 import axios from "./root.service.js";
 
-const API_URL = "/reclamos";
+export const API_URL = "/reclamos";
 
 export async function crearReclamo(data){//LISTO
     const token = localStorage.getItem("token");

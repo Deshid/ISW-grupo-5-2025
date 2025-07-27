@@ -2,12 +2,31 @@ import { useState } from "react";
 import useTodosReclamos from "@hooks/reclamos/useTodosReclamos";
 import useUserRole from "../hooks/auth/useUserRole";
 import BuscarReclamoPorId from "./SearchReclamoPorId";
-import "../styles/todosReclamos.css";
+import { updateEstadoReclamo } from "@services/reclamos.service";
+import EditarReclamo from "./EditarReclamo";
+import { API_URL } from "@services/reclamos.service";
+import "@styles/todosReclamos.css";
+
 
 export default function TodosReclamos() {
-    const { reclamos, loading, mensaje, page, setPage, totalPages, verAnonimos, setVerAnonimos, ordenDesc, setOrdenDesc } = useTodosReclamos();
+    const { reclamos, loading, mensaje, page, setPage, totalPages, verAnonimos, setVerAnonimos, ordenDesc, setOrdenDesc, fetchReclamos } = useTodosReclamos();
     const { isAdmin } = useUserRole();
     const [busquedaActiva, setBusquedaActiva] = useState(false);
+    const [reclamoEditado, setReclamoEditado] = useState(null);
+
+    const handleEditarReclamo = async (reclamoEditado) => {
+        console.log("ID reclamo:", reclamoEditado.id);
+        // Solo enviar estado y comentarioInterno
+        const { id, estado, comentarioInterno } = reclamoEditado;
+        console.log("Datos enviados:", { estado, comentarioInterno });
+        const url = `${API_URL}/${id}`;
+        console.log("URL PATCH:", url);
+        await updateEstadoReclamo(id, { estado, comentarioInterno });
+        setReclamoEditado(null);
+        if (typeof fetchReclamos === 'function') {
+            fetchReclamos();
+        }
+    };
 
     const reclamosOrdenados = [...reclamos].sort((a, b) => {
         const fechaA = new Date(a.fecha.split(",")[0].split("-").reverse().join("-") + "T" + (a.fecha.split(",")[1]?.trim() || "00:00"));
@@ -63,7 +82,7 @@ export default function TodosReclamos() {
             {!busquedaActiva && (
                 <ul className="reclamos-lista">
                     {reclamosOrdenados.map((r) => (
-                        <li key={r.id} className="reclamo-card">
+                        <li key={r.id} className="reclamo-card" onDoubleClick={() => setReclamoEditado(r)}>
                             <strong>{r.categoria}</strong>
                             <p>{r.descripcion}</p>
                             <span>Estado: {r.estado}</span>
@@ -84,9 +103,18 @@ export default function TodosReclamos() {
                                     <p className="hora">ID reclamo: {r.id}</p>
                                 </>
                             )}
+                            <p className="hora">Comentarios: {r.comentarioInterno}</p>
                             <p className="hora">Anonimo: {r.anonimo ? "Sí" : "No"}</p>
                         </li>
                     ))}
+
+                    {reclamoEditado && (
+                        <EditarReclamo
+                            reclamo={reclamoEditado}
+                            onClose={() => setReclamoEditado(null)}
+                            onSave={handleEditarReclamo}
+                        />
+                    )}
                 </ul>
             )}
         </div>
