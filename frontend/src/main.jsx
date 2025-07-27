@@ -10,7 +10,9 @@ import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
 
-import Reservas from '@components/ReservaForm';
+
+import ReservasAdmin from '@pages/ReservasAdmin';
+import Reclamos from "./pages/Reclamos";
 
 const router = createBrowserRouter([
   {
@@ -29,11 +31,23 @@ const router = createBrowserRouter([
           <Users />
         </ProtectedRoute>
         ),
-      },
-      {
-        path: '/reclamos',
-        element: (<Reclamos/>)
-      }
+    },
+    {
+      path: '/reclamos',
+      element: <Reclamos/>
+    },
+      {  
+        path: '/reservas',
+        element: <Reservas/>
+  },
+    {
+      path: '/reservas-admin',
+      element: (
+        <ProtectedRoute allowedRoles={['administrador']}>
+          <ReservasAdmin />
+        </ProtectedRoute>
+      )
+    },
     ]
   },
   {

@@ -59,20 +59,19 @@ const Navbar = () => {
                         </NavLink>
                     </li>
                     {userRole === 'administrador' && (
-                    <li>
-                        <NavLink 
-                            to="/users" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass();
-                            }} 
-                            className={({ isActive }) => isActive ? "active" : undefined}
-                        >
-                            Usuarios
-                        </NavLink>
-                    </li>
+                        <li>
+                            <NavLink 
+                                to="/users" 
+                                onClick={() => { 
+                                    setMenuOpen(false); 
+                                    addActiveClass();
+                                }} 
+                                className={({ isActive }) => isActive ? "active" : undefined}
+                            >
+                                Usuarios
+                            </NavLink>
+                        </li>
                     )}
-{/*inicio reservas*/}  
                     <li>
                         <NavLink 
                             to="/reservas" 
@@ -85,7 +84,20 @@ const Navbar = () => {
                             Reservas
                         </NavLink>
                     </li>
-{/*fin reservas*/}  
+                    {userRole === 'administrador' && (
+                        <li>
+                            <NavLink 
+                                to="/reservas-admin" 
+                                onClick={() => { 
+                                    setMenuOpen(false); 
+                                    addActiveClass();
+                                }} 
+                                className={({ isActive }) => isActive ? "active" : undefined}
+                            >
+                                Visualizar reservas
+                            </NavLink>
+                        </li>
+                    )}
                     <li>
                         <NavLink 
                             to="/reclamos" 
@@ -98,8 +110,6 @@ const Navbar = () => {
                             Reclamos
                         </NavLink>
                     </li>
-{/*inicio sancionar*/}  
-{/*fin sancionar*/}  
                     <li> 
                         <NavLink 
                             to="/auth" 
@@ -112,7 +122,6 @@ const Navbar = () => {
                             Cerrar sesión
                         </NavLink>
                     </li>
-
                 </ul>
             </div>
             <div className="hamburger" onClick={toggleMenu}>

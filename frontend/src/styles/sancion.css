@@ -1,0 +1,136 @@
+.popup-sancion, .popup-sanciones {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+.sanciones-btn-top {
+    padding: 0.5rem 1rem;
+    background: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.sancionar-btn-top {
+    padding: 0.5rem 1rem;
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.popup-contentido-sanciones {
+    color: #333;
+    background: #F4FFED;
+    padding: 2rem;
+    border-radius: 10px;
+    min-width: 350px;
+    text-align: center;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+}
+
+.popup-contentido-sanciones h2 {
+    margin-bottom: 1rem;
+    color: #2980b9;
+}
+
+.popup-contentido-sanciones input[type="date"],
+.popup-contentido-sanciones input[type="text"] {
+    padding: 0.5rem;
+    border: 1px solid #b3bce7;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.popup-contentido-sanciones button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 0 0.5rem;
+}
+.btn-cancelar {
+    background: #757575;
+    color: #fff;
+}
+
+.popup-contentido-sanciones .confirm {
+    border-radius: 5px;
+    background: #e74c3c;
+    color: #fff;
+}
+
+.popup-contentido-sanciones .cerrar {
+    border-radius: 5px;
+    margin-top: 10px;
+    background: #757575;
+    color: #fff;
+}
+
+.popup-contentido-sanciones .suspender {
+    border-radius: 5px;
+    background: #e67e22;
+    color: #fff;
+}
+
+.popup-contentido-sanciones .btn-aprobar {
+    border-radius: 5px;
+    background: #119970;
+    color: #fff;
+    min-width: 100px;
+    padding: 0.6rem 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+}
+
+.popup-contentido-sanciones .btn-cerrar{
+    padding: 0.45rem 0.6rem;
+    font-size: 0.95em;
+    min-width: 40px;
+    max-width: 70px;
+    width: auto;
+    background: #757575;
+    color: #fff;
+    border-radius: 5px;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+    box-shadow: none;
+    transition: none;
+}
+
+.popup-contentido-sanciones table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+}
+
+.popup-contentido-sanciones th, .popup-contentido-sanciones td {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+}
+
+.popup-contentido-sanciones th {
+    background: #eee;
+}
+
+@media (max-width: 600px) {
+    .popup-contentido-sanciones {
+    min-width: 90vw;
+    padding: 1rem;
+    }
+}

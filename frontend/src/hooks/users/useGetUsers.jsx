@@ -7,13 +7,27 @@ const useUsers = () => {
     const fetchUsers = async () => {
         try {
             const response = await getUsers();
-            const formattedData = response.map(user => ({
-                nombreCompleto: user.nombreCompleto,
-                rut: user.rut,
-                email: user.email,
-                rol: user.rol,
-                createdAt: user.createdAt
-            }));
+            const formattedData = response.map(user => {
+                let estado = 'Activo';
+                if (user.sanciones && Array.isArray(user.sanciones)) {
+                  const hoy = new Date();
+                  const sancionActiva = user.sanciones.find(s => {
+                    const inicio = new Date(s.fecha_inicio);
+                    const fin = new Date(s.fecha_fin);
+                    return inicio <= hoy && fin >= hoy;
+                  });
+                  if (sancionActiva) estado = 'Sancionado';
+                }
+                return {
+                  id: user.id,
+                  nombreCompleto: user.nombreCompleto,
+                  rut: user.rut,
+                  email: user.email,
+                  rol: user.rol,
+                  createdAt: user.createdAt,
+                  estado
+                };
+            });
             dataLogged(formattedData);
             setUsers(formattedData);
         } catch (error) {
