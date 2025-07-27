@@ -1,0 +1,64 @@
+.reclamos-lista {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.reclamo-card {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 220px;
+    background: #fff;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    box-shadow: 0 2px 50px rgba(0,0,0,0.07);
+    padding: 1rem;
+    min-width: 220px;
+    max-width: 300px;
+    gap: 0.5rem;
+}
+
+.reclamo-card:hover {
+    border-color: #007bff;
+    background-color: #f1dada;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.eliminar-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.eliminar-btn {
+    display: flex;
+    align-self: flex-end;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 4px;
+}
+
+.eliminar-btn:hover img {
+    filter: brightness(0.7) drop-shadow(0 0 2px #d33);
+    transition: filter 0.2s;
+}
+
+.hora {
+    margin: 0;
+}
+
+.alerta-error {
+    background: #ffe0e0;
+    color: #b30000;
+    border: 1px solid #ffb3b3;
+    padding: 10px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-weight: bold;
+    text-align: center;
+}

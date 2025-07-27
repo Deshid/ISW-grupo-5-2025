@@ -3,12 +3,14 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from '@pages/Login';
 import Home from '@pages/Home';
 import Users from '@pages/Users';
+import Reclamos from '@pages/Reclamos';
 import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
 import '@styles/styles.css';
-import Reservas from '@components/ReservaForm';
+
+
 import ReservasAdmin from '@pages/ReservasAdmin';
 import Reclamos from "./pages/Reclamos";
 
@@ -20,7 +22,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/home',
-        element: <Home/>
+        element: <Home/>,
       },
       {
         path: '/users',
@@ -47,7 +49,6 @@ const router = createBrowserRouter([
       )
     },
     ]
-    // rutas autorizadas para todos los usuarios autenticados
   },
   {
     path: '/auth',
@@ -56,7 +57,14 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <Register/>
-  }, 
+  },
+  {  path: '/reservas',
+    element: <Reservas/>
+  },
+  {
+    path: '/reclamos',
+    element: <Reclamos/>
+  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
