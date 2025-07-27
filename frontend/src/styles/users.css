@@ -1,5 +1,5 @@
 .main-container-user {
-display: flex; 
+    display: flex; 
     justify-content: center;
     align-items: flex-start;
     gap: 40px; 
@@ -9,7 +9,6 @@ display: flex;
     max-width: 1000px;
     margin-top: 40px; 
     margin-bottom: 40px;
-    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -34,21 +33,28 @@ display: flex;
     color: #2e4c48;
     margin-left: 70px;
 }
-
 .filter-actions {
     display: flex;
     gap: 10px;
     button {
         background: rgba(255, 255, 255, 0.87);
+        color: #2e4c48;
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: 1px solid #b3bce7;
         border: #fff;
         cursor: pointer;
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-        
     }
 }
 
 .delete-user-button {
     margin-right: 70px;
+}
+
+.sancionar-btn-top:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 @media (max-width: 767px) {

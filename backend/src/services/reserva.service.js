@@ -145,13 +145,17 @@ export async function getMisReservasServicio(req, res) {
             where: { usuario: { id: userId } },
             relations: ["espacioComun", "usuario"],
         });
+        // Formatea la hora para mostrar solo HH:mm
+        function soloHoraMinuto(hora) {
+            if (!hora) return "";
+            return hora.split(":").slice(0,2).join(":");
+        }
         const resultado = reservas.map(reserva => ({
             id_reserva: reserva.id,
             estado: reserva.estado,
             fecha: reserva.fecha,
-            horaInicio: reserva.horaInicio,
-            horaFin: reserva.horaFin,
-            espacioComun: reserva.espacioComun.id_espacio,
+            horaInicio: soloHoraMinuto(reserva.horaInicio),
+            horaFin: soloHoraMinuto(reserva.horaFin),
             espacioComun: reserva.espacioComun.nombre,
         }));
         return [resultado, null];
@@ -173,27 +177,43 @@ export async function actualizarReservaServicio(req, res) {
         });
         if (!reserva) return [null, "Reserva no encontrada"];
         if (reserva.estado !== "pendiente") return [null, "Solo puedes modificar reservas en estado pendiente"];
+        // Calcular diferencia de días entre hoy y la nueva fecha
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const fechaReserva = new Date(fecha || reserva.fecha);
+        fechaReserva.setHours(0, 0, 0, 0);
+        const diferenciaDias = (fechaReserva - hoy) / (1000 * 60 * 60 * 24);
         if (diferenciaDias < 1) {
             return [null, "Solo puedes modificar reservas con al menos 1 día de anticipación"];
         }
         if (fecha) reserva.fecha = fecha;
         if (horaInicio) reserva.horaInicio = horaInicio;
         if (horaFin) reserva.horaFin = horaFin;
-        if (id_espacio) reserva.espacioComun = { id_espacio };
+        if (id_espacio) {
+            // Buscar el espacio común por id para obtener el nombre
+            const espacioRepository = AppDataSource.getRepository("EspacioComun");
+            const espacio = await espacioRepository.findOne({ where: { id_espacio } });
+            reserva.espacioComun = espacio;
+        }
         await reservaRepository.save(reserva);
+        // Recargar la reserva con relaciones actualizadas
+        const reservaActualizada = await reservaRepository.findOne({
+            where: { id: reserva.id },
+            relations: ["usuario", "espacioComun"],
+        });
         const respuesta = {
-            fecha: reserva.fecha,
-            horaInicio: reserva.horaInicio,
-            horaFin: reserva.horaFin,
-            estado: reserva.estado,
+            fecha: reservaActualizada.fecha,
+            horaInicio: reservaActualizada.horaInicio,
+            horaFin: reservaActualizada.horaFin,
+            estado: reservaActualizada.estado,
             usuario: {
-                nombreCompleto: reserva.usuario.nombreCompleto,
-                email: reserva.usuario.email,
+                nombreCompleto: reservaActualizada.usuario.nombreCompleto,
+                email: reservaActualizada.usuario.email,
             },
             espacioComun: {
-                id_espacio: reserva.espacioComun.id_espacio,
-                nombre: reserva.espacioComun.nombre,
-                descripcion: reserva.espacioComun.descripcion
+                id_espacio: reservaActualizada.espacioComun.id_espacio,
+                nombre: reservaActualizada.espacioComun.nombre,
+                descripcion: reservaActualizada.espacioComun.descripcion
             }
         };
         return [respuesta, null];
@@ -246,7 +266,7 @@ export async function solicitarCancelacionReservaServicio(req, res) {
 }
 
 /* Obtener reservas pendientes (ADMIN) */
-export async function getReservasAdminServicio(res) {
+export async function getReservasPendientesAdminServicio(res) {
     try {
         const reservaRepository = AppDataSource.getRepository(ReservaSchema);
         const reservas = await reservaRepository.find({
@@ -314,6 +334,110 @@ export async function actualizarEstadoReservaServicio(id, estado) {
         return [reserva, null];
     } catch (error) {
         console.error("Error al actualizar estado de reserva:", error);
+        return [null, "Error interno del servidor"];
+    }
+}
+
+// obtener reservas aprobadas (admin)
+export async function getReservasAprobadasServicio() {
+    try {
+        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
+        const reservas = await reservaRepository.find({
+            where: { estado: "aprobada" },
+            relations: ["usuario", "espacioComun"],
+            order: { fecha: "ASC", horaInicio: "ASC" }
+        });
+        const resultadoAprobadas = reservas.map(reserva => ({
+            id: reserva.id,
+            estado: reserva.estado,
+            fecha: reserva.fecha,
+            horaInicio: reserva.horaInicio,
+            horaFin: reserva.horaFin,
+            usuario: {
+                id: reserva.usuario.id,
+                nombreCompleto: reserva.usuario.nombreCompleto,
+                email: reserva.usuario.email,
+                rut: reserva.usuario.rut,
+                rol: reserva.usuario.rol
+            },
+            espacioComun: {
+                id_espacio: reserva.espacioComun.id_espacio,
+                nombre: reserva.espacioComun.nombre,
+                descripcion: reserva.espacioComun.descripcion
+            }
+        }));
+        return [resultadoAprobadas, null];
+    } catch (error) {
+        console.error("Error al obtener reservas aprobadas:", error);
+        return [null, "Error interno del servidor"];
+    }
+}
+// Obtener reservas rechazadas (admin)
+export async function getReservasRechazadasServicio() {
+    try {
+        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
+        const reservas = await reservaRepository.find({
+            where: { estado: "rechazada" },
+            relations: ["usuario", "espacioComun"],
+            order: { fecha: "ASC", horaInicio: "ASC" }
+        });
+        const resultadoRechazadas = reservas.map(reserva => ({
+            id: reserva.id,
+            estado: reserva.estado,
+            fecha: reserva.fecha,
+            horaInicio: reserva.horaInicio,
+            horaFin: reserva.horaFin,
+            usuario: {
+                id: reserva.usuario.id,
+                nombreCompleto: reserva.usuario.nombreCompleto,
+                email: reserva.usuario.email,
+                rut: reserva.usuario.rut,
+                rol: reserva.usuario.rol
+            },
+            espacioComun: {
+                id_espacio: reserva.espacioComun.id_espacio,
+                nombre: reserva.espacioComun.nombre,
+                descripcion: reserva.espacioComun.descripcion
+            }
+        }));
+        return [resultadoRechazadas, null];
+    } catch (error) {
+        console.error("Error al obtener reservas rechazadas:", error);
+        return [null, "Error interno del servidor"];
+    }
+}
+
+// Obtener reservas canceladas (admin)
+export async function getReservasCanceladasServicio() {
+    try {
+        const reservaRepository = AppDataSource.getRepository(ReservaSchema);
+        const reservas = await reservaRepository.find({
+            where: { estado: "cancelada" },
+            relations: ["usuario", "espacioComun"],
+            order: { fecha: "ASC", horaInicio: "ASC" }
+        });
+        const resultadoCanceladas = reservas.map(reserva => ({
+            id: reserva.id,
+            estado: reserva.estado,
+            fecha: reserva.fecha,
+            horaInicio: reserva.horaInicio,
+            horaFin: reserva.horaFin,
+            usuario: {
+                id: reserva.usuario.id,
+                nombreCompleto: reserva.usuario.nombreCompleto,
+                email: reserva.usuario.email,
+                rut: reserva.usuario.rut,
+                rol: reserva.usuario.rol
+            },
+            espacioComun: {
+                id_espacio: reserva.espacioComun.id_espacio,
+                nombre: reserva.espacioComun.nombre,
+                descripcion: reserva.espacioComun.descripcion
+            }
+        }));
+        return [resultadoCanceladas, null];
+    } catch (error) {
+        console.error("Error al obtener reservas canceladas:", error);
         return [null, "Error interno del servidor"];
     }
 }

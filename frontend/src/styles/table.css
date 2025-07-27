@@ -1,6 +1,47 @@
-.table-container .tabulator .tabulator-col {
-    background-color: #119970;
+.table-container .tabulator th, .table-container .tabulator .tabulator-col {
+    color: #fff !important;
+}
+.table-container .tabulator .tabulator-header {
+    background: #119970;
     color: #fff;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    font-size: 1.08em;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+.table-container .tabulator .tabulator-col {
+    background: transparent;
+    color: #119970;
+    font-weight: 600;
+    border: none;
+}
+.table-container .tabulator {
+    background: #f4ffed;
+    border-radius: 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    border: none;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+}
+.table-container .tabulator .tabulator-row {
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 1em;
+    color: #2e4c48;
+    transition: background 0.2s;
+}
+.table-container .tabulator .tabulator-row:nth-child(even) {
+    background: #f4ffed;
+}
+.table-container .tabulator .tabulator-row:hover {
+    background: #e0f7e9;
+}
+.table-container .tabulator .tabulator-footer {
+    background: #f4ffed;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+    border: none;
 }
 .tabulator .tabulator-footer .tabulator-page {
     background-color: #fff;

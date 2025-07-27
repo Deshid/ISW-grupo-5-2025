@@ -1,4 +1,3 @@
-
 import Table from '@components/Table';
 import useUsers from '@hooks/users/useGetUsers.jsx';
 import Search from '../components/Search';
@@ -84,35 +83,37 @@ const Users = () => {
             </div>
             <button
               className='sanciones-btn-top'
-              style={{ padding: '0.5rem 1rem', background: '#2980b9', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
               onClick={handleOpenSanciones}
             >
               Sanciones
             </button>
-            <button
-              className='sancionar-btn-top'
-              style={{ padding: '0.5rem 1rem', background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-              onClick={() => {
-                if (dataUser && dataUser.length > 0) {
-                  setSancionandoUserId(dataUser[0].id);
-                  setShowSancionPopup(true);
-                  setSancionForm({ fecha_inicio: '', fecha_fin: '', motivo: '' });
-                  setSancionError('');
-                } else {
-                  setSancionError('Selecciona un usuario para sancionar.');
-                  setShowSancionPopup(true);
-                }
-              }}
-            >
-              Sancionar
-            </button>
+      <button
+        className='sancionar-btn-top'
+        style={{ padding: '0.5rem 1rem', background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+        disabled={dataUser.length === 0}
+        onClick={() => {
+          if (dataUser && dataUser.length > 0) {
+            setSancionandoUserId(dataUser[0].id);
+            setShowSancionPopup(true);
+            setSancionForm({ fecha_inicio: '', fecha_fin: '', motivo: '' });
+            setSancionError('');
+          } else {
+            setSancionError('Selecciona un usuario para sancionar.');
+            setShowSancionPopup(true);
+          }
+        }}
+      >
+        Sancionar
+      </button>
       {showSancionPopup && (
         <div className="popup-sancion">
-          <div className="popup-content">
-            <h2>Sancionar usuario</h2>
+          <div className="popup-contentido-sanciones">
+            <h2>🚫Sancionar usuario</h2>
             {sancionError && <p style={{ color: 'red' }}>{sancionError}</p>}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+              <label style={{textAlign: 'left', fontSize: '0.8rem' }}>Fecha inicio</label>
               <input type="date" value={sancionForm.fecha_inicio} onChange={e => setSancionForm(f => ({ ...f, fecha_inicio: e.target.value }))} placeholder="Fecha inicio" />
+              <label style={{textAlign: 'left', fontSize: '0.8rem' }}>Fecha fin</label>
               <input type="date" value={sancionForm.fecha_fin} onChange={e => setSancionForm(f => ({ ...f, fecha_fin: e.target.value }))} placeholder="Fecha fin" />
               <input type="text" value={sancionForm.motivo} onChange={e => setSancionForm(f => ({ ...f, motivo: e.target.value }))} placeholder="Motivo" />
             </div>
@@ -143,11 +144,11 @@ const Users = () => {
                   } else {
                     setSancionError('No se pudo sancionar.');
                   }
-                } catch (error) {
+                } catch {
                   setSancionError('Error al sancionar usuario.');
                 }
               }}>Confirmar</button>
-              <button className="cancel" onClick={() => setShowSancionPopup(false)}>Cancelar</button>
+              <button className="btn-cancelar" onClick={() => setShowSancionPopup(false)}>Cancelar</button>
             </div>
           </div>
         </div>
@@ -163,56 +164,56 @@ const Users = () => {
           onSelectionChange={handleSelectionChange}
         />
       {showSancionesPopup && (
-        <div className="popup-sanciones">
-          <div className="popup-content">
-            <h2>Sanciones activas</h2>
-            {sancionesActivas.length === 0 ? (
-              <p>No hay sanciones activas.</p>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Usuario</th>
-                    <th>Fecha inicio</th>
-                    <th>Fecha fin</th>
-                    <th>Motivo</th>
-                    <th>Acción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sancionesActivas.map((s, i) => (
-                    <tr key={i}>
-                      <td>{s.nombreCompleto}</td>
-                      <td>{s.fecha_inicio}</td>
-                      <td>{s.fecha_fin}</td>
-                      <td>{s.motivo}</td>
-                      <td>
-                        <button className="suspender"
-                          onClick={async () => {
-                            const { suspenderSancion } = await import('../services/sancion.service');
-                            const { showSuccessAlert, showErrorAlert } = await import('../helpers/sweetAlert');
-                            try {
-                            if (!s.usuarioId) {
-                              showErrorAlert('Error','No se encontró el id del usuario sancionado.');
-                              return;
-                            }
-                            await suspenderSancion(s.usuarioId);
-                              showSuccessAlert('¡Sanción suspendida!','La sanción ha sido suspendida correctamente.');
-                              handleOpenSanciones();
-                            } catch (err) {
-                              showErrorAlert('Error','No se pudo suspender la sanción.');
-                            }
-                          }}
-                        >Suspender sanción</button>
-                      </td>
+          <div className="popup-sanciones">
+            <div className="popup-contentido-sanciones">
+              <h2>📒 Sanciones activas</h2>
+              {sancionesActivas.length === 0 ? (
+                <p>No hay sanciones activas.</p>
+              ) : (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Usuario</th>
+                      <th>Fecha inicio</th>
+                      <th>Fecha fin</th>
+                      <th>Motivo</th>
+                      <th>Acción</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-            <button className="cancel" onClick={() => setShowSancionesPopup(false)}>Cerrar</button>
+                  </thead>
+                  <tbody>
+                    {sancionesActivas.map((s, i) => (
+                      <tr key={i}>
+                        <td>{s.nombreCompleto}</td>
+                        <td>{s.fecha_inicio}</td>
+                        <td>{s.fecha_fin}</td>
+                        <td>{s.motivo}</td>
+                        <td>
+                          <button className="suspender"
+                            onClick={async () => {
+                              const { suspenderSancion } = await import('../services/sancion.service');
+                              const { showSuccessAlert, showErrorAlert } = await import('../helpers/sweetAlert');
+                              try {
+                              if (!s.usuarioId) {
+                                showErrorAlert('Error','No se encontró el id del usuario sancionado.');
+                                return;
+                              }
+                              await suspenderSancion(s.usuarioId);
+                                showSuccessAlert('¡Sanción suspendida!','La sanción ha sido suspendida correctamente.');
+                                handleOpenSanciones();
+                              } catch {
+                                showErrorAlert('Error','No se pudo suspender la sanción.');
+                              }
+                            }}
+                          >Suspender sanción</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              <button className="btn-cerrar" onClick={() => setShowSancionesPopup(false)}>Cerrar</button>
+            </div>
           </div>
-        </div>
       )}
       </div>
       <Popup show={isPopupOpen} setShow={setIsPopupOpen} data={dataUser} action={handleUpdate} />
