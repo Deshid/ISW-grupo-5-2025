@@ -14,12 +14,16 @@ export async function getReclamosPendientes(){ // PENDIENTE
     const token = localStorage.getItem("token");
     return await axios.get(`${API_URL}/pendientes`, { headers: { Authorization: `Bearer ${token}` } });
 };
-export async function getReclamosConIdentidad(){// PENDIENTE
+export async function getReclamosConIdentidad(){// LISTO
     const token = localStorage.getItem("token");
     return await axios.get(`${API_URL}/identidades`, { headers: { Authorization: `Bearer ${token}` } });
 };
-export async function updateEstadoReclamo(id, data){
-    const token = localStorage.getItem("token");// PENDIENTE
+export async function getReclamoPorId(id) { // LISTO
+    const token = localStorage.getItem("token");
+    return await axios.get(`${API_URL}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+}
+export async function updateEstadoReclamo(id, data){// PENDIENTE
+    const token = localStorage.getItem("token");
     return await axios.patch(`${API_URL}/${id}`, data, { headers: { Authorization: `Bearer ${token}` } });
 };
 export async function cancelarReclamo(id, data){//LISTO

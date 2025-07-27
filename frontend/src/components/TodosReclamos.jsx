@@ -1,11 +1,13 @@
+import { useState } from "react";
 import useTodosReclamos from "@hooks/reclamos/useTodosReclamos";
 import useUserRole from "../hooks/auth/useUserRole";
+import BuscarReclamoPorId from "./SearchReclamoPorId";
 import "../styles/todosReclamos.css";
 
 export default function TodosReclamos() {
     const { reclamos, loading, mensaje, page, setPage, totalPages, verAnonimos, setVerAnonimos, ordenDesc, setOrdenDesc } = useTodosReclamos();
     const { isAdmin } = useUserRole();
-
+    const [busquedaActiva, setBusquedaActiva] = useState(false);
 
     const reclamosOrdenados = [...reclamos].sort((a, b) => {
         const fechaA = new Date(a.fecha.split(",")[0].split("-").reverse().join("-") + "T" + (a.fecha.split(",")[1]?.trim() || "00:00"));
@@ -27,11 +29,11 @@ export default function TodosReclamos() {
                 >
                     {ordenDesc ? "↓" : "↑"}
                 </button>
-
             </h3>
+
             {isAdmin && (
                 <div>
-                    <label >
+                    <label>
                         <span>Ver datos de reclamos anónimos</span>
                         <button
                             className={`switch-btn${verAnonimos ? " on" : ""}`}
@@ -42,44 +44,51 @@ export default function TodosReclamos() {
                     </label>
                 </div>
             )}
-                            
-            <div className="Flechas-reclamos">
-                <button onClick={() => setPage(page - 1)} 
-                        disabled={page <= 1}
-                >
-                    <span className="icon">←</span> Volver
-                </button>
-                <button onClick={() => setPage(page + 1)} 
-                        disabled={page >= totalPages}
-                >
-                    <span className="icon">→</span> Siguiente
-                </button>
+            <BuscarReclamoPorId
+                verAnonimos={verAnonimos}
+                onBusquedaActiva={setBusquedaActiva}
+            />
+            {!busquedaActiva && (
+            <div className="buscar-reclamo-activo">
+                <div className="Flechas-reclamos">
+                    <button onClick={() => setPage(page - 1)} disabled={page <= 1}>
+                        <span className="icon">←</span> Volver
+                    </button>
+                    <button onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
+                        <span className="icon">→</span> Siguiente
+                    </button>
+                </div>
             </div>
-            <ul className="reclamos-lista">
-                {reclamosOrdenados.map((r) => (
-                    <li key={r.id} className="reclamo-card">
-                        <strong>{r.categoria}</strong>
-                        <p>{r.descripcion}</p>
-                        <span>Estado: {r.estado}</span>
-                        <p className="fecha">Fecha: {r.soloFecha}</p>
-                        <p className="hora">Hora: {r.soloHora}</p>
-                        {(!r.anonimo || verAnonimos) ? (
-                            <>
-                                <p className="hora">Autor: {r.user ? r.user.nombreCompleto : "Anónimo"}</p>
-                                <p className="hora">Email: {r.user ? r.user.email : "No disponible"}</p>
-                                <p className="hora">RUT: {r.user ? r.user.rut : "No disponible"}</p>
-                            </>
-                        ) : (
-                            <>
-                                <p className="hora">Autor: Anónimo</p>
-                                <p className="hora">Email: Anónimo</p>
-                                <p className="hora">RUT: Anónimo</p>
-                            </>
-                        )}
-                        <p className="hora">Anonimo: {r.anonimo ? "Sí" : "No"}</p>
-                    </li>
-                ))}
-            </ul>
+            )}
+            {!busquedaActiva && (
+                <ul className="reclamos-lista">
+                    {reclamosOrdenados.map((r) => (
+                        <li key={r.id} className="reclamo-card">
+                            <strong>{r.categoria}</strong>
+                            <p>{r.descripcion}</p>
+                            <span>Estado: {r.estado}</span>
+                            <p className="fecha">Fecha: {r.soloFecha}</p>
+                            <p className="hora">Hora: {r.soloHora}</p>
+                            {(!r.anonimo || verAnonimos) ? (
+                                <>
+                                    <p className="hora">Autor: {r.user ? r.user.nombreCompleto : "Anónimo"}</p>
+                                    <p className="hora">Email: {r.user ? r.user.email : "No disponible"}</p>
+                                    <p className="hora">RUT: {r.user ? r.user.rut : "No disponible"}</p>
+                                    <p className="hora">ID reclamo: {r.id}</p>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="hora">Autor: Anónimo</p>
+                                    <p className="hora">Email: Anónimo</p>
+                                    <p className="hora">RUT: Anónimo</p>
+                                    <p className="hora">ID reclamo: {r.id}</p>
+                                </>
+                            )}
+                            <p className="hora">Anonimo: {r.anonimo ? "Sí" : "No"}</p>
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }

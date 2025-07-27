@@ -77,4 +77,11 @@ router.get("/identidades",
     getReclamosConIdentidad
 );
 
+router.get("/:id",
+    authenticateJwt,
+    authorizeRoles("administrador", "presidente"),
+    validateBody(getAllReclamosValidation),
+    getReclamo
+);
+
 export default router;

@@ -62,6 +62,7 @@ export async function getAllReclamos(req, res) {
         const reclamosFiltrados = reclamos.map(r => {
             const reclamoFormateado = {
                 ...r,
+                fecha: formatoFecha(r.fecha),
                 user: r.user ? {
                     nombreCompleto: r.user.nombreCompleto,
                     email: r.user.email,
@@ -90,10 +91,36 @@ export async function getReclamo(req, res) {
         const { id } = req.params;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["user"] });
+
         if (!reclamo) {
             return handleErrorClient(res, 404, "Reclamo no encontrado");
         }
-        return handleSuccess(res, 200, "Reclamo encontrado", reclamo);
+
+        // Formatear la fecha igual que en getAllReclamos
+        const fechaObj = new Date(reclamo.fecha);
+        const fechaFormateada = fechaObj.toLocaleDateString("es-CL") + ", " + fechaObj.toLocaleTimeString("es-CL");
+
+        // Formatear el usuario igual que en la lista
+        const user = reclamo.user
+            ? {
+                nombreCompleto: reclamo.user.nombreCompleto,
+                email: reclamo.user.email,
+                rut: reclamo.user.rut
+            }
+            : null;
+
+            fecha: fechaFormateada,
+            descripcion: reclamo.descripcion,
+            categoria: reclamo.categoria,
+            anonimo: reclamo.anonimo,
+            estado: reclamo.estado,
+            comentarioInterno: reclamo.comentarioInterno,
+            resolucion: reclamo.resolucion,
+            usuarioId: reclamo.usuarioId,
+            user
+        };
+
+        return handleSuccess(res, 200, "Reclamo encontrado", reclamoFormateado);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
