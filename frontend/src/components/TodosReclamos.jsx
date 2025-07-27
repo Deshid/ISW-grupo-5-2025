@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useTodosReclamos from "@hooks/reclamos/useTodosReclamos";
 import useUserRole from "../hooks/auth/useUserRole";
 import BuscarReclamoPorId from "./SearchReclamoPorId";
@@ -16,7 +16,6 @@ export default function TodosReclamos() {
 
     const handleEditarReclamo = async (reclamoEditado) => {
         console.log("ID reclamo:", reclamoEditado.id);
-        // Solo enviar estado y comentarioInterno
         const { id, estado, comentarioInterno } = reclamoEditado;
         console.log("Datos enviados:", { estado, comentarioInterno });
         const url = `${API_URL}/${id}`;
@@ -25,8 +24,12 @@ export default function TodosReclamos() {
         setReclamoEditado(null);
         if (typeof fetchReclamos === 'function') {
             fetchReclamos();
+            
         }
     };
+    useEffect(() => {
+        console.log("Reclamos actualizados (efectivamente):", reclamos);
+    }, [reclamos]);
 
     const reclamosOrdenados = [...reclamos].sort((a, b) => {
         const fechaA = new Date(a.fecha.split(",")[0].split("-").reverse().join("-") + "T" + (a.fecha.split(",")[1]?.trim() || "00:00"));

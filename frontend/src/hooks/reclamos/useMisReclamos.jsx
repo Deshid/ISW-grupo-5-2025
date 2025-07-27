@@ -9,7 +9,6 @@ export default function useMisReclamos() {
     const [total, setTotal] = useState(0);
     const limit = 10;
 
-    // Mueve la función aquí, fuera del useEffect
     async function fetchReclamos() {
         setLoading(true);
         try {

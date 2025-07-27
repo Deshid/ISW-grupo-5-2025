@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useEditarReclamoForm } from "../hooks/useEditarReclamoForm";
 import '@styles/editarReclamo.css';
 
 export default function EditarReclamo({ reclamo, onClose, onSave }) {
-    const [estado, setEstado] = useState(reclamo.estado);
-    const [comentarioInterno, setComentarioInterno] = useState(reclamo.comentarioInterno || "");
-
+    const { estado, setEstado, comentarioInterno, setComentarioInterno } = useEditarReclamoForm(reclamo);
     const handleSubmit = (e) => {
         e.preventDefault();
         onSave({ id: reclamo.id, estado, comentarioInterno });
