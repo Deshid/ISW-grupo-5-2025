@@ -17,9 +17,7 @@ export default function EditarReclamo({ reclamo, onClose, onSave }) {
                     <label>
                         <p>Estado:</p>
                         <select value={estado} onChange={e => setEstado(e.target.value)} required>
-                            { estado === "pendiente" && (
-                                <option value="pendiente" disabled>Pendiente</option>
-                            )}
+                            <option value="pendiente" style={{display:'none'}}>Pendiente</option>
                             <option value="en_proceso">En proceso</option>
                             <option value="resuelto">Resuelto</option>
                             <option value="cancelado">Cancelado</option>

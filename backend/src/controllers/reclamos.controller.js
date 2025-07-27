@@ -243,22 +243,45 @@ export async function getReclamosPendientes(req, res) {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-        const { id } = req.params;
+        const order = req.query.order === "asc" ? "ASC" : "DESC";
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const [reclamos, total] = await reclamoRepository.findAndCount({
             where: [
-            { estado: "pendiente" },
-            { estado: "en_proceso" }
+                { estado: "pendiente" }
             ],
             relations: ["user"],
             skip,
-            take: limit
+            take: limit,
+            order: { fecha: order }
         });
         if (!reclamos || reclamos.length === 0) {
             return handleErrorClient(res, 200, "No hay reclamos pendientes o en proceso", []);
         }
+        const reclamosFormateados = reclamos.map(reclamo => {
+            const fechaObj = new Date(reclamo.fecha);
+            const fechaFormateada = fechaObj.toLocaleDateString("es-CL") + ", " + fechaObj.toLocaleTimeString("es-CL");
+            const user = reclamo.user
+                ? {
+                    nombreCompleto: reclamo.user.nombreCompleto,
+                    email: reclamo.user.email,
+                    rut: reclamo.user.rut
+                }
+                : null;
+            return {
+                id: reclamo.id,
+                fecha: fechaFormateada,
+                descripcion: reclamo.descripcion,
+                categoria: reclamo.categoria,
+                anonimo: reclamo.anonimo,
+                estado: reclamo.estado,
+                comentarioInterno: reclamo.comentarioInterno,
+                resolucion: reclamo.resolucion,
+                usuarioId: reclamo.usuarioId,
+                user
+            };
+        });
         return handleSuccess(res, 200, "Reclamos pendientes encontrados", {
-            reclamos,
+            reclamos: reclamosFormateados,
             page,
             limit,
             total,

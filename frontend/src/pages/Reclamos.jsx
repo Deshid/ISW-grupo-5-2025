@@ -4,6 +4,7 @@ import "../styles/reclamos.css";
 import ReclamoForm from "../components/ReclamoForm";
 import MisReclamos from "../components/MisReclamos";
 import TodosReclamos from "../components/TodosReclamos";
+import ReclamosPendientes from "../components/ReclamosPendientes";
 
 
 export default function Reclamos() {
@@ -50,7 +51,7 @@ export default function Reclamos() {
             </div>
 
         {opcion === "crear" && <div className="formularioReclamo"><ReclamoForm /></div>}
-        {opcion === "reclamos" && <div className="formularioReclamo">Aquí va la lista de reclamos</div>}
+        {opcion === "reclamos" && <div className="formularioReclamo"><ReclamosPendientes /></div>}
         {opcion === "misReclamos" && <div className="formularioReclamo"><MisReclamos /></div>}
         {opcion === "todosReclamos" && <div className="formularioReclamo"><TodosReclamos/></div>}
         </div>

@@ -51,3 +51,14 @@
 .hora {
     margin: 0;
 }
+
+.alerta-error {
+    background: #ffe0e0;
+    color: #b30000;
+    border: 1px solid #ffb3b3;
+    padding: 10px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-weight: bold;
+    text-align: center;
+}
