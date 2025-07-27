@@ -4,7 +4,10 @@ import {
     actualizarReservaServicio,
     cancelarReservaServicio,
     getMisReservasServicio,
-    getReservasAdminServicio,
+    getReservasAprobadasServicio,
+    getReservasCanceladasServicio,
+    getReservasPendientesAdminServicio,
+    getReservasRechazadasServicio,
     getReservasServicio,
     reservarEspacioServicio,
     solicitarCancelacionReservaServicio
@@ -84,9 +87,9 @@ export async function solicitarCancelacionReserva(req, res) {
     }
 }
 /* Obtener reservas pendientes (ADMIN) */
-export async function getReservasAdmin(req, res) {
+export async function getReservasPendientesAdmin(req, res) {
     try {
-        const [resultado, err] = await getReservasAdminServicio(res);
+        const [resultado, err] = await getReservasPendientesAdminServicio(res);
         if (err) return res.status(400).json({ error: err });
         res.status(200).json(resultado);
     } catch (error) {
@@ -116,6 +119,41 @@ export async function actualizarEstadoReserva(req, res) {
         res.status(200).json({ message: `Reserva ${estado}`, reserva });
     } catch (error) {
         console.error("Error al actualizar estado de reserva:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+}
+
+/* Obtener reservas aprobadas (ADMIN) */
+export async function getReservasAprobadas(req, res) {
+    try {
+        const [resultado, err] = await getReservasAprobadasServicio();
+        if (err) return res.status(400).json({ error: err });
+        res.status(200).json(resultado);
+    } catch (error) {
+        console.error("Error al obtener reservas aprobadas:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+}
+
+/* Obtener reservas rechazadas (ADMIN) */
+export async function getReservasRechazadas(req, res) {
+    try {
+        const [resultado, err] = await getReservasRechazadasServicio();
+        if (err) return res.status(400).json({ error: err });
+        res.status(200).json(resultado);
+    } catch (error) {
+        console.error("Error al obtener reservas rechazadas:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+}
+/* Obtener reservas canceladas (ADMIN) */
+export async function getReservasCanceladas(req, res) {
+    try {
+        const [resultado, err] = await getReservasCanceladasServicio();
+        if (err) return res.status(400).json({ error: err });
+        res.status(200).json(resultado);
+    } catch (error) {
+        console.error("Error al obtener reservas canceladas:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 }
