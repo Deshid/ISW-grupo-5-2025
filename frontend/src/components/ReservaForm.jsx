@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { createReserva, getMisReservas, solicitarCancelacionReservaUsuario, actualizarReserva } from "@services/reserva.service.js";
 import { showSuccessAlert } from "../helpers/sweetAlert";
+import Swal from 'sweetalert2';
 import '../styles/reserva.css';
 
-export default function VistaReserva() {
+export default function ReservaForm() {
     const [form, setForm] = useState({
         id_espacio: "",
         fecha: "",
@@ -201,12 +202,31 @@ export default function VistaReserva() {
                                         <button
                                             className="btn-warning"
                                             onClick={async () => {
-                                                if (window.confirm("¿Seguro que quieres cancelar esta reserva?")) {
+                                                const isAprobada = r.estado === "aprobada";
+                                                const result = await Swal.fire({
+                                                    title: '¿Seguro que quieres cancelar esta reserva?',
+                                                    text: isAprobada ? 'Esta acción enviará una solicitud de cancelación al administrador.' : '',
+                                                    icon: 'warning',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#d33',
+                                                    cancelButtonColor: '#3085d6',
+                                                    confirmButtonText: 'Sí, cancelar',
+                                                    cancelButtonText: 'No, mantener',
+                                                    reverseButtons: true
+                                                });
+                                                if (result.isConfirmed) {
                                                     const res = await solicitarCancelacionReservaUsuario(r.id || r.id_reserva);
                                                     if (res && res.reserva) {
-                                                        setMensaje("Solicitud de cancelación enviada.");
+                                                        if (isAprobada) {
+                                                            await Swal.fire('Solicitud enviada', 'La solicitud de cancelación fue enviada correctamente.', 'success');
+                                                            setMensaje("Solicitud de cancelación enviada.");
+                                                        } else {
+                                                            await Swal.fire('Reserva cancelada', 'La reserva fue cancelada correctamente.', 'success');
+                                                            setMensaje("");
+                                                        }
                                                         cargarReservas();
                                                     } else {
+                                                        await Swal.fire('Error', res.error || "Error al solicitar cancelación.", 'error');
                                                         setMensaje(res.error || "Error al solicitar cancelación.");
                                                     }
                                                 }

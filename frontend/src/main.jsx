@@ -3,71 +3,71 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from '@pages/Login';
 import Home from '@pages/Home';
 import Users from '@pages/Users';
+import Reclamos from '@pages/Reclamos';
 import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
+import Reservas from '@pages/Reservas';
 import ProtectedRoute from '@components/ProtectedRoute';
+import Pagos from '@pages/Pagos';
+
 import '@styles/styles.css';
-import Reservas from '@components/ReservaForm';
+import Reservas from '@pages/Reservas';
 import ReservasAdmin from '@pages/ReservasAdmin';
-import Reclamos from "./pages/Reclamos";
-import Pagos from "@pages/pagos";
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Root />,
-    errorElement: <Error404 />,
+    element: <Root/>,
+    errorElement: <Error404/>,
     children: [
       {
         path: '/home',
-        element: <Home />
+        element: <Home/>,
       },
       {
         path: '/users',
         element: (
-          <ProtectedRoute allowedRoles={['administrador']}>
-            <Users />
-          </ProtectedRoute>
+        <ProtectedRoute allowedRoles={['administrador']}>
+          <Users />
+        </ProtectedRoute>
         ),
-      },
-      {
-        path: '/reclamos',
-        element: <Reclamos />
-      },
-      {
+    },
+    {
+      path: '/reclamos',
+      element: <Reclamos/>
+    },
+      {  
         path: '/reservas',
-        element: <Reservas />
-      },
-      {
-        path: '/reservas-admin',
-        element: (
-          <ProtectedRoute allowedRoles={['administrador']}>
-            <ReservasAdmin />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: '/pagos',
-        element: (
-          <ProtectedRoute allowedRoles={['tesorero']}>
-            <Pagos />
-          </ProtectedRoute>
-        )
-      },
+        element: <Reservas/>
+  },
+    {
+      path: '/reservas-admin',
+      element: (
+        <ProtectedRoute allowedRoles={['administrador']}>
+          <ReservasAdmin />
+        </ProtectedRoute>
+      )
+    },
     ]
-  
   },
   {
     path: '/auth',
-    element: <Login />
+    element: <Login/>
   },
   {
     path: '/register',
-    element: <Register />
+    element: <Register/>
   },
+  {  path: '/reservas',
+    element: <Reservas/>
+  },
+  {
+    path: '/reclamos',
+    element: <Reclamos/>
+  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router} />
+  <RouterProvider router={router}/>
 )

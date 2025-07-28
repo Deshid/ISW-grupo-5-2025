@@ -9,7 +9,7 @@
     overflow: hidden;
 }
 
-.home-container::before {
+.home-container, .login-container::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -17,7 +17,19 @@
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
-    filter: blur(0px); /* desenfoque*/
+    filter: blur(0px); /* desenfoque por defecto */
+    z-index: 0;
+}
+
+.login-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('https://static.vecteezy.com/system/resources/previews/002/835/799/large_2x/abstract-geometric-3d-triangles-background-free-vector.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    filter: blur(0px); /* desenfoque solo para login */
     z-index: 0;
 }
 
@@ -89,12 +101,13 @@
 
 /* Contenedor para las imágenes del lado derecho */
 .home-images {
-    flex: 1;
-    position: relative;
-    width: 600px;
-    height: 640px;
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
-    margin-left: 40px;
+    z-index: 0;
+    pointer-events: none;
 }
 
 /* Lado derecho - imagen 1*/

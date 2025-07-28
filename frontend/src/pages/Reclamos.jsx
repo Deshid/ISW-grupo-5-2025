@@ -1,37 +1,74 @@
-import ReclamoForm from "../components/ReclamoForm";
-import axios from "axios";
 import { useState } from "react";
-import { Button, Snackbar, Alert, Typography, Box } from "@mui/material";
+import useUserRole from "../hooks/auth/useUserRole";
+import "../styles/reclamos.css";
+import ReclamoForm from "../components/ReclamoForm";
+import MisReclamos from "../components/MisReclamos";
+import TodosReclamos from "../components/TodosReclamos";
+import ReclamosPendientes from "../components/ReclamosPendientes";
+
 
 export default function Reclamos() {
-    const [open, setOpen] = useState(false);
-    const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-
-    const handleSubmit = async (form) => {
-        try {
-        // Reemplaza 'TU_TOKEN' por la obtención real del token (ej: desde contexto o localStorage)
-        const token = localStorage.getItem("token");
-        await axios.post("/api/reclamos", form, { headers: { Authorization: `Bearer ${token}` } });
-        setSnackbar({ open: true, message: "Reclamo creado con éxito", severity: "success" });
-        setOpen(false);
-        } catch (err) {
-        setSnackbar({ open: true, message: err?.response?.data?.message || "Error al crear reclamo", severity: "error" });
-        }
-    };
+    const { isAdmin, isPresidente, isSecretario, isTesorero, isUsuario } = useUserRole();
+    // Determinar la opción inicial según el rol
+    let opcionInicial = "";
+    if (isUsuario) {
+        opcionInicial = "crear";
+    } else if (isSecretario || isTesorero) {
+        opcionInicial = "reclamos";
+    } else if (isAdmin || isPresidente) {
+        opcionInicial = "todosReclamos";
+    }
+    const [opcion, setOpcion] = useState(opcionInicial);
 
     return (
-        <Box sx={{ mt: 12, p: 2 }}>
-        <Typography variant="h4" gutterBottom>Gestión de Reclamos</Typography>
-        <Button variant="contained" onClick={handleOpen}>Nuevo Reclamo</Button>
-        <ReclamoForm open={open} onClose={handleClose} onSubmit={handleSubmit} />
-        <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-            <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
-            {snackbar.message}
-            </Alert>
-        </Snackbar>
-        </Box>
+        <div className="containerReclamos">
+            <div className="containerCuerpo">
+                <div className="containerReclamos-btns">
+                {isUsuario && (
+                    <li>
+                        <button
+                            className={
+                                opcion === "crear"
+                                    ? "btn-CrearReclamo btn-activo"
+                                    : "btn-CrearReclamo btn-palida"
+                            }
+                            onClick={() => setOpcion("crear")}
+                        >
+                            Crear Reclamo
+                        </button>
+                    </li>
+                )}
+                    {(isSecretario || isTesorero) && (
+                        <li>
+                            <button className="btn-ReclamosPendientes" onClick={() => setOpcion("reclamos")}>Reclamos Pendientes</button>
+                        </li>
+                    )}
+                    {(isAdmin || isPresidente) && (
+                        <li>
+                            <button className="btn-MostrarReclamos" onClick={() => setOpcion("todosReclamos")}>Mostrar Reclamos</button>
+                        </li>
+                    )}
+                    {isUsuario && (
+                        <li>
+                            <button
+                                className={
+                                    opcion === "misReclamos"
+                                        ? "btn-MisReclamos btn-activo"
+                                        : "btn-MisReclamos btn-palida"
+                                }
+                                onClick={() => setOpcion("misReclamos")}
+                            >
+                                Mis Reclamos
+                            </button>
+                        </li>
+                    )}
+                </div>
+
+                {opcion === "crear" && <div className="formularioReclamo"><ReclamoForm /></div>}
+                {opcion === "reclamos" && <div className="formularioReclamo"><ReclamosPendientes /></div>}
+                {opcion === "misReclamos" && <div className="formularioReclamo"><MisReclamos /></div>}
+                {opcion === "todosReclamos" && <div className="formularioReclamo"><TodosReclamos /></div>}
+            </div>
+        </div>
     );
-    }
+}

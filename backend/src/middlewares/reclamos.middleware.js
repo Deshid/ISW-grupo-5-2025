@@ -5,8 +5,8 @@ export function validateBody(schema) {
         if (error) {
             return res.status(400).json({
                 ok: false,
-                mensaje: "Error de validación",
-                error: error.message
+                mensaje: error.details[0].message,
+                error: error.details[0].message
             });
         }
         next();
@@ -20,8 +20,8 @@ export function validateAllreclamos(schema) {
         if (error) {
             return res.status(400).json({
                 ok: false,
-                mensaje: "Error de validación",
-                error: error.message
+                mensaje: error.details[0].message,
+                error: error.details[0].message
             });
         }
         next();
