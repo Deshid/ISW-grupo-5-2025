@@ -179,11 +179,13 @@ export async function getMisReclamos(req, res) {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
+        const order = req.query.order === "asc" ? "ASC" : "DESC";
         const [reclamos, total] = await reclamoRepository.findAndCount({
             where: { user: { id: req.user.id } },
             relations: ["user"],
             skip,
-            take: limit
+            take: limit,
+            order: { fecha: order }
         });
         if (!reclamos || reclamos.length === 0) {
             return handleErrorClient(res, 200, "No existen reclamos enviados en su historial", []);

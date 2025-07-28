@@ -114,6 +114,16 @@ export const getMisReclamosValidation = Joi.object({
             "number.integer": "El límite debe ser un entero.",
             "number.min": "El límite debe ser al menos 1.",
             "number.max": "El límite no puede ser mayor a 100."
+        }),
+    order: Joi.string()
+        .valid("asc", "desc")
+        .optional()
+        .default("desc")
+        .messages({
+            "any.only": "El orden debe ser 'asc' o 'desc'.",
+            "string.base": "El orden debe ser un texto.",
+            "string.empty": "El orden no puede estar vacío.",
+            "any.required": "El orden es obligatorio."
         })
 });
 

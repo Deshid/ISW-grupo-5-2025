@@ -7,12 +7,13 @@ export default function useMisReclamos() {
     const [mensaje, setMensaje] = useState("");
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
+    const [ordenDesc, setOrdenDesc] = useState(true);
     const limit = 5;
 
     async function fetchReclamos() {
         setLoading(true);
         try {
-            const res = await getMisReclamos(page, limit);
+            const res = await getMisReclamos(page, limit, ordenDesc ? "desc" : "asc");
             if (res && res.data && res.data.data && res.data.data.reclamos) {
                 const reclamosProcesados = res.data.data.reclamos.map(r => {
                     let soloFecha = "";
@@ -55,7 +56,7 @@ export default function useMisReclamos() {
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [page]);
+    }, [page, ordenDesc]);
 
     const handleCancelarReclamo = async (id) => {
         if (!window.confirm("¿Seguro que deseas cancelar este reclamo?")) return;
@@ -74,5 +75,5 @@ export default function useMisReclamos() {
 
     const totalPages = Math.ceil(total / limit);
 
-    return { reclamos, loading, mensaje, handleCancelarReclamo, page, setPage, totalPages };
+    return { reclamos, loading, mensaje, handleCancelarReclamo, page, setPage, totalPages, ordenDesc, setOrdenDesc };
 }

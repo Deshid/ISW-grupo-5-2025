@@ -8,7 +8,7 @@ export async function crearReclamo(data){//LISTO
 };
 export async function getMisReclamos(page = 1, limit = 10){
     const token = localStorage.getItem("token");
-    return await axios.get(`${API_URL}/mis-reclamos?page=${page}&limit=${limit}`, { headers: { Authorization: `Bearer ${token}` } });
+    return await axios.get(`${API_URL}/mis-reclamos?page=${page}&limit=${limit}&order=${arguments[2]||"desc"}`, { headers: { Authorization: `Bearer ${token}` } });
 };
 export async function getReclamosPendientes(page = 1, limit = 10, order = "desc"){
     const token = localStorage.getItem("token");
