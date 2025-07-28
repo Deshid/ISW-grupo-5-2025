@@ -3,7 +3,7 @@ import { createReserva, getMisReservas, solicitarCancelacionReservaUsuario, actu
 import { showSuccessAlert } from "../helpers/sweetAlert";
 import '../styles/reserva.css';
 
-export default function VistaReserva() {
+export default function ReservaForm() {
     const [form, setForm] = useState({
         id_espacio: "",
         fecha: "",

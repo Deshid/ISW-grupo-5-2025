@@ -1,4 +1,5 @@
-import {ReservaForm, ListaReservasUsuario, VerReservasAdmin} from "@components/ReservaForm";
+import ReservaForm from "@components/ReservaForm";
+import VerReservasAdmin from "./ReservasAdmin";
 import '../styles/reserva.css';
 
 const Reservas = () => {
@@ -10,10 +11,7 @@ const Reservas = () => {
             {isAdmin ? (
                 <VerReservasAdmin />
             ) : (
-                <>
-                    <ReservaForm />
-                    <ListaReservasUsuario />
-                </>
+                <ReservaForm />
             )}
         </div>
     );

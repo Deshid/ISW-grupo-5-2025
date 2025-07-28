@@ -7,7 +7,7 @@ export default function useMisReclamos() {
     const [mensaje, setMensaje] = useState("");
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-    const limit = 10;
+    const limit = 5;
 
     async function fetchReclamos() {
         setLoading(true);
@@ -49,7 +49,12 @@ export default function useMisReclamos() {
     }
 
     useEffect(() => {
-        fetchReclamos();
+        setLoading(true);
+        const timer = setTimeout(() => {
+            fetchReclamos();
+        }, 300);
+
+        return () => clearTimeout(timer);
     }, [page]);
 
     const handleCancelarReclamo = async (id) => {

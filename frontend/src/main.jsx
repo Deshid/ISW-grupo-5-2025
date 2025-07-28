@@ -7,12 +7,10 @@ import Reclamos from '@pages/Reclamos';
 import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
+import Reservas from '@pages/Reservas';
 import ProtectedRoute from '@components/ProtectedRoute';
-import '@styles/styles.css';
-
-
 import ReservasAdmin from '@pages/ReservasAdmin';
-import Reclamos from "./pages/Reclamos";
+import '@styles/styles.css';
 
 const router = createBrowserRouter([
   {
