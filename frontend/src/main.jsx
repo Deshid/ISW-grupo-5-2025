@@ -9,8 +9,10 @@ import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import Reservas from '@pages/Reservas';
 import ProtectedRoute from '@components/ProtectedRoute';
-import ReservasAdmin from '@pages/ReservasAdmin';
+
 import '@styles/styles.css';
+import Reservas from '@pages/Reservas';
+import ReservasAdmin from '@pages/ReservasAdmin';
 
 const router = createBrowserRouter([
   {
