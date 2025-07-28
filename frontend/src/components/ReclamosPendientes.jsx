@@ -10,15 +10,28 @@ export default function ReclamosPendientes() {
 
     return (
         <div className="containerReclamosPendientes">
-            <h2>Reclamos Pendientes
+            <h2>Reclamos Pendientes</h2>
+            <div className="flechas-reclamos">
                 <button
                     className="orden-fecha-btn"
                     onClick={() => setOrdenDesc(!ordenDesc)}
-                    title={ordenDesc ? "Ordenar de más antiguo a más reciente" : "Ordenar de más reciente a más antiguo"}
                 >
-                    {ordenDesc ? "↓" : "↑"}
+                {ordenDesc ? "Más reciente ↑" : "Más antiguo ↓"}
                 </button>
-            </h2>
+                <button
+                    onClick={() => page > 1 && setPage(page - 1)}
+                    disabled={page <= 1}
+                >
+                    <span className="icon">←</span> Volver
+                </button>
+                <button
+                    onClick={() => page < totalPages && setPage(page + 1)}
+                    disabled={page >= totalPages}
+                >
+                    Siguiente <span className="icon">→</span> 
+                </button>
+
+            
             {loading && <p>Cargando...</p>}
             {mensaje && <p>{mensaje}</p>}
             {mensaje && !loading && (
@@ -26,34 +39,43 @@ export default function ReclamosPendientes() {
                     {mensaje}
                 </div>
             )}
-            <div className="Flechas-reclamos">
-                <button onClick={() => setPage(page - 1)} disabled={page <= 1}>
+            </div>
+                <ul className="reclamos-lista">
+                    {reclamos.map((r) => (
+                        <li key={r.id} className="reclamo-card">
+                            {r.anonimo === true && (
+                                <strong>Fue Anónimo</strong>
+                            )} 
+                            <strong> ID reclamo: {r.id}</strong>
+                            <strong>Categoría: {r.categoria}</strong>
+                            <span>Descripción: {r.descripcion}</span>
+                            <span>Estado: {r.estado}</span>
+                            <strong>Creación del reclamo:</strong>
+                            <span className="fecha">Fecha: {r.soloFecha}</span>
+                            <span className="hora">Hora: {r.soloHora}</span>
+                            {r.comentarioInterno && (
+                                <>
+                                    <strong className="hora">Comentarios Directiva:</strong>
+                                    <span>{r.comentarioInterno}</span>
+                                </>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            <div className="flechas-reclamos">
+                <button
+                    onClick={() => page > 1 && setPage(page - 1)}
+                    disabled={page <= 1}
+                >
                     <span className="icon">←</span> Volver
                 </button>
-                <button onClick={() => setPage(page + 1)} disabled={page >= (totalPages || 1)}>
-                    <span className="icon">→</span> Siguiente
+                <button
+                    onClick={() => page < totalPages && setPage(page + 1)}
+                    disabled={page >= totalPages}
+                >
+                    Siguiente <span className="icon">→</span> 
                 </button>
             </div>
-            <ul className="reclamos-lista">
-                {reclamos.map(reclamo => {
-                    const autor = !reclamo.anonimo && reclamo.user ? reclamo.user.nombreCompleto : "Anónimo";
-                    const email = !reclamo.anonimo && reclamo.user ? reclamo.user.email : "Anónimo";
-                    const rut = !reclamo.anonimo && reclamo.user ? reclamo.user.rut : "Anónimo";
-                    return (
-                        <li key={reclamo.id} className="reclamo-card">
-                            <strong>{reclamo.categoria}</strong>
-                            <span>Estado: {reclamo.estado}</span>
-                            <p className="fecha">Fecha: {reclamo.soloFecha}</p>
-                            <p className="hora">Hora: {reclamo.soloHora}</p>
-                            <p className="hora">Autor: {autor}</p>
-                            <p className="hora">Email: {email}</p>
-                            <p className="hora">RUT: {rut}</p>
-                            <p className="hora">ID reclamo: {reclamo.id}</p>
-                            <p className="hora">Anonimo: {reclamo.anonimo ? "Sí" : "No"}</p>
-                        </li>
-                    );
-                })}
-            </ul>
         </div>
     );
 }

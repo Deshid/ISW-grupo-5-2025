@@ -87,6 +87,9 @@ li {
     align-items: center;
 }
 
+.btn-ReclamosPendientes {
+    display: none;
+}
 
 .form-reclamo {
     display: flex;

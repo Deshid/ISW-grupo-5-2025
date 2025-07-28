@@ -8,8 +8,17 @@ import ReclamosPendientes from "../components/ReclamosPendientes";
 
 
 export default function Reclamos() {
-    const [opcion, setOpcion] = useState("crear"); // Mostrar crear reclamo por defecto
     const { isAdmin, isPresidente, isSecretario, isTesorero, isUsuario } = useUserRole();
+    // Determinar la opción inicial según el rol
+    let opcionInicial = "";
+    if (isUsuario) {
+        opcionInicial = "crear";
+    } else if (isSecretario || isTesorero) {
+        opcionInicial = "reclamos";
+    } else if (isAdmin || isPresidente) {
+        opcionInicial = "todosReclamos";
+    }
+    const [opcion, setOpcion] = useState(opcionInicial);
 
     return (
         <div className="containerReclamos">
