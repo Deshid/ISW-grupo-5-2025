@@ -11,54 +11,63 @@ import '@styles/styles.css';
 import Reservas from '@components/ReservaForm';
 import ReservasAdmin from '@pages/ReservasAdmin';
 import Reclamos from "./pages/Reclamos";
+import Pagos from "@pages/pagos";
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Root/>,
-    errorElement: <Error404/>,
+    element: <Root />,
+    errorElement: <Error404 />,
     children: [
       {
         path: '/home',
-        element: <Home/>
+        element: <Home />
       },
       {
         path: '/users',
         element: (
-        <ProtectedRoute allowedRoles={['administrador']}>
-          <Users />
-        </ProtectedRoute>
+          <ProtectedRoute allowedRoles={['administrador']}>
+            <Users />
+          </ProtectedRoute>
         ),
-    },
-    {
-      path: '/reclamos',
-      element: <Reclamos/>
-    },
-      {  
+      },
+      {
+        path: '/reclamos',
+        element: <Reclamos />
+      },
+      {
         path: '/reservas',
-        element: <Reservas/>
-  },
-    {
-      path: '/reservas-admin',
-      element: (
-        <ProtectedRoute allowedRoles={['administrador']}>
-          <ReservasAdmin />
-        </ProtectedRoute>
-      )
-    },
+        element: <Reservas />
+      },
+      {
+        path: '/reservas-admin',
+        element: (
+          <ProtectedRoute allowedRoles={['administrador']}>
+            <ReservasAdmin />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: '/pagos',
+        element: (
+          <ProtectedRoute allowedRoles={['tesorero']}>
+            <Pagos />
+          </ProtectedRoute>
+        )
+      },
     ]
-    // rutas autorizadas para todos los usuarios autenticados
+  
   },
   {
     path: '/auth',
-    element: <Login/>
+    element: <Login />
   },
   {
     path: '/register',
-    element: <Register/>
-  }, 
+    element: <Register />
+  },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router}/>
+  <RouterProvider router={router} />
 )

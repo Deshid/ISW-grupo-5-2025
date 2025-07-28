@@ -49,10 +49,7 @@ const Navbar = () => {
                     <li>
                         <NavLink 
                             to="/home" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass();
-                            }} 
+                            onClick={() => setMenuOpen(false)} // Solo cierra el menú
                             className={({ isActive }) => isActive ? "active" : undefined}
                         >
                             Inicio
@@ -62,10 +59,7 @@ const Navbar = () => {
                         <li>
                             <NavLink 
                                 to="/users" 
-                                onClick={() => { 
-                                    setMenuOpen(false); 
-                                    addActiveClass();
-                                }} 
+                                onClick={() => setMenuOpen(false)} 
                                 className={({ isActive }) => isActive ? "active" : undefined}
                             >
                                 Usuarios
@@ -75,10 +69,7 @@ const Navbar = () => {
                     <li>
                         <NavLink 
                             to="/reservas" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass();
-                            }} 
+                            onClick={() => setMenuOpen(false)} 
                             className={({ isActive }) => isActive ? "active" : undefined}
                         >
                             Reservas
@@ -88,29 +79,35 @@ const Navbar = () => {
                         <li>
                             <NavLink 
                                 to="/reservas-admin" 
-                                onClick={() => { 
-                                    setMenuOpen(false); 
-                                    addActiveClass();
-                                }} 
+                                onClick={() => setMenuOpen(false)} 
                                 className={({ isActive }) => isActive ? "active" : undefined}
                             >
                                 Visualizar reservas
                             </NavLink>
                         </li>
                     )}
-                    <li>
+                    <li> {/* <-- Este es el <li> para Reclamos */}
                         <NavLink 
                             to="/reclamos" 
-                            onClick={() => { 
-                                setMenuOpen(false); 
-                                addActiveClass();
-                            }} 
+                            onClick={() => setMenuOpen(false)} 
                             className={({ isActive }) => isActive ? "active" : undefined}
                         >
                             Reclamos
                         </NavLink>
-                    </li>
-                    <li> 
+                    </li> {/* <-- Cierre correcto del <li> de Reclamos */}
+                    
+                    {userRole === 'tesorero' && (
+                        <li> {/* <-- Este es el <li> para Pagos, ahora como hermano de Reclamos */}
+                            <NavLink 
+                                to="/pagos" 
+                                onClick={() => setMenuOpen(false)} 
+                                className={({ isActive }) => isActive ? "active" : undefined}
+                            >
+                                Pagos
+                            </NavLink>
+                        </li>
+                    )}
+                    <li> {/* <-- Este es el <li> para Cerrar sesión */}
                         <NavLink 
                             to="/auth" 
                             onClick={() => { 
