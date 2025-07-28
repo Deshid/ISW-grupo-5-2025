@@ -2,8 +2,22 @@
     margin-bottom: 1rem;
 }
 
+
 .buscar-reclamo button {
     margin-left: 0.5rem;
+    background: #119970;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 18px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.buscar-reclamo button:hover {
+    background: #0e7d5f;
+    transform: scale(1.02);
 }
 
 .buscar-reclamo .reclamos-lista {

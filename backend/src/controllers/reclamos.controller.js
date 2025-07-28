@@ -133,7 +133,7 @@ export async function updateEstadoReclamo(req, res) {
         const { id } = req.params;
         const { estado, comentarioInterno } = req.body;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
-        // Buscar con la relación usuario para obtener el email
+
         const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["user"] });
         if (!reclamo) {
             return handleErrorClient(res, 404, "Reclamo no encontrado");
@@ -157,7 +157,6 @@ export async function updateEstadoReclamo(req, res) {
         reclamo.estado = estado;
         await reclamoRepository.save(reclamo);
 
-        // Enviar notificación por correo
         if (reclamo.user && reclamo.user.email) {
             const asunto = `Actualización de estado de tu reclamo sobre ${reclamo.categoria} (ID: ${reclamo.id})`;
             const texto = `Hola ${reclamo.user.nombreCompleto},
@@ -169,6 +168,10 @@ export async function updateEstadoReclamo(req, res) {
         }
         return handleSuccess(res, 200, "Estado del reclamo actualizado", reclamo);
     } catch (error) {
+        
+        if (error.isJoi) {
+            return handleErrorClient(res, 400, error.details[0].message);
+        }
         handleErrorServer(res, 500, error.message);
     }
 }
@@ -179,11 +182,13 @@ export async function getMisReclamos(req, res) {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
+        const order = req.query.order === "asc" ? "ASC" : "DESC";
         const [reclamos, total] = await reclamoRepository.findAndCount({
             where: { user: { id: req.user.id } },
             relations: ["user"],
             skip,
-            take: limit
+            take: limit,
+            order: { fecha: order }
         });
         if (!reclamos || reclamos.length === 0) {
             return handleErrorClient(res, 200, "No existen reclamos enviados en su historial", []);

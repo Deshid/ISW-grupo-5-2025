@@ -4,7 +4,7 @@ import { showSuccessAlert } from "../helpers/sweetAlert";
 import Swal from 'sweetalert2';
 import '../styles/reserva.css';
 
-export default function VistaReserva() {
+export default function ReservaForm() {
     const [form, setForm] = useState({
         id_espacio: "",
         fecha: "",

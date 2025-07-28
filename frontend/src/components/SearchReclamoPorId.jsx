@@ -1,7 +1,7 @@
 import Search from "./Search";
 import useBuscarReclamoPorId from "@hooks/reclamos/useBuscarReclamoPorId";
 import { useState, useEffect } from "react";
-import "@styles/BuscarReclamoPorId.css";
+//import "@styles/BuscarReclamoPorId.css";
 
 export default function BuscarReclamoPorId({ verAnonimos, onBusquedaActiva }) {
     const { reclamo, loading, mensaje, buscarPorId, limpiarBusqueda } = useBuscarReclamoPorId();

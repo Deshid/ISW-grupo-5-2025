@@ -7,7 +7,9 @@ import Reclamos from '@pages/Reclamos';
 import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
+import Reservas from '@pages/Reservas';
 import ProtectedRoute from '@components/ProtectedRoute';
+
 import '@styles/styles.css';
 import Reservas from '@pages/Reservas';
 import ReservasAdmin from '@pages/ReservasAdmin';
