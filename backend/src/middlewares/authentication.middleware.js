@@ -28,16 +28,3 @@ export function authenticateJwt(req, res, next) {
     next();
   })(req, res, next);
 }
-
-export function isTesorero(req, res, next) {
-  if (req.user && req.user.rol === "tesorero") {
-    return next();
-  }
-
-  return res.status(403).json({
-    message: "Acceso denegado, solo el tesorero puede registrar pagos",
-
-  });
-
-}
-

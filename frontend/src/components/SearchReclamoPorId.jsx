@@ -1,11 +1,15 @@
+
 import Search from "./Search";
 import useBuscarReclamoPorId from "@hooks/reclamos/useBuscarReclamoPorId";
 import { useState, useEffect } from "react";
-import "@styles/BuscarReclamoPorId.css";
+import EditarReclamo from "./EditarReclamo";
+import { updateEstadoReclamo } from "@services/reclamos.service";
 
 export default function BuscarReclamoPorId({ verAnonimos, onBusquedaActiva }) {
     const { reclamo, loading, mensaje, buscarPorId, limpiarBusqueda } = useBuscarReclamoPorId();
     const [idBusqueda, setIdBusqueda] = useState("");
+    const [reclamoEditado, setReclamoEditado] = useState(null);
+    const [errorEdicion, setErrorEdicion] = useState("");
 
     useEffect(() => {
         if (onBusquedaActiva) onBusquedaActiva(!!reclamo);
@@ -20,6 +24,21 @@ export default function BuscarReclamoPorId({ verAnonimos, onBusquedaActiva }) {
         limpiarBusqueda();
     };
 
+    const handleEditarReclamo = async (reclamoEditado) => {
+        setErrorEdicion("");
+        try {
+            await updateEstadoReclamo(reclamoEditado.id, {
+                estado: reclamoEditado.estado,
+                comentarioInterno: reclamoEditado.comentarioInterno
+            });
+            setReclamoEditado(null);
+            // Si tienes una función para refrescar la búsqueda, puedes llamarla aquí
+            // limpiarBusqueda();
+        } catch (error) {
+            setErrorEdicion(error.response?.data?.mensaje || error.response?.data?.error || "Error al actualizar el reclamo");
+        }
+    };
+
     return (
         <div className="buscar-reclamo">
             <Search
@@ -32,7 +51,7 @@ export default function BuscarReclamoPorId({ verAnonimos, onBusquedaActiva }) {
             {mensaje && <div>{mensaje}</div>}
             {reclamo && (
                 <ul className="reclamos-lista">
-                    <li key={reclamo.id} className="reclamo-card">
+                    <li key={reclamo.id} className="reclamo-card" onDoubleClick={() => setReclamoEditado(reclamo)}>
                         <strong>{reclamo.categoria}</strong>
                         <span>Estado: {reclamo.estado}</span>
                         <p className="fecha">Fecha: {reclamo.soloFecha}</p>
@@ -52,7 +71,14 @@ export default function BuscarReclamoPorId({ verAnonimos, onBusquedaActiva }) {
                                 <p className="hora">ID reclamo: {reclamo.id}</p>
                             </>
                         )}
-                        <p className="hora">Anonimo: {reclamo.anonimo ? "Sí" : "No"}</p>
+                        {reclamoEditado && (
+                            <EditarReclamo
+                                reclamo={reclamoEditado}
+                                onClose={() => { setReclamoEditado(null); setErrorEdicion(""); }}
+                                onSave={handleEditarReclamo}
+                                error={errorEdicion}
+                            />
+                        )}
                     </li>
                 </ul>
             )}

@@ -4,7 +4,6 @@ import useUserRole from "../hooks/auth/useUserRole";
 import BuscarReclamoPorId from "./SearchReclamoPorId";
 import { updateEstadoReclamo } from "@services/reclamos.service";
 import EditarReclamo from "./EditarReclamo";
-import { API_URL } from "@services/reclamos.service";
 import "@styles/todosReclamos.css";
 
 
@@ -13,18 +12,19 @@ export default function TodosReclamos() {
     const { isAdmin } = useUserRole();
     const [busquedaActiva, setBusquedaActiva] = useState(false);
     const [reclamoEditado, setReclamoEditado] = useState(null);
+    const [errorEdicion, setErrorEdicion] = useState("");
 
     const handleEditarReclamo = async (reclamoEditado) => {
-        console.log("ID reclamo:", reclamoEditado.id);
-        const { id, estado, comentarioInterno } = reclamoEditado;
-        console.log("Datos enviados:", { estado, comentarioInterno });
-        const url = `${API_URL}/${id}`;
-        console.log("URL PATCH:", url);
-        await updateEstadoReclamo(id, { estado, comentarioInterno });
-        setReclamoEditado(null);
-        if (typeof fetchReclamos === 'function') {
-            fetchReclamos();
-            
+        setErrorEdicion("");
+        try {
+            const { id, estado, comentarioInterno } = reclamoEditado;
+            await updateEstadoReclamo(id, { estado, comentarioInterno });
+            setReclamoEditado(null);
+            if (typeof fetchReclamos === 'function') {
+                fetchReclamos();
+            }
+        } catch (error) {
+            setErrorEdicion(error.response?.data?.mensaje || error.response?.data?.error || "Error al actualizar el reclamo");
         }
     };
     useEffect(() => {
@@ -43,15 +43,37 @@ export default function TodosReclamos() {
 
     return (
         <div>
-            <h3>Todos los Reclamos
+            <h3>Todos los Reclamos</h3>
+            <div className="flechas-reclamos">
                 <button
                     className="orden-fecha-btn"
                     onClick={() => setOrdenDesc(!ordenDesc)}
-                    title={ordenDesc ? "Ordenar de más antiguo a más reciente" : "Ordenar de más reciente a más antiguo"}
                 >
-                    {ordenDesc ? "↓" : "↑"}
+                {ordenDesc ? "Más reciente ↑" : "Más antiguo ↓"}
                 </button>
-            </h3>
+                <button
+                    onClick={() => page > 1 && setPage(page - 1)}
+                    disabled={page <= 1}
+                >
+                    <span className="icon">←</span> Volver
+                </button>
+                <button
+                    onClick={() => page < totalPages && setPage(page + 1)}
+                    disabled={page >= totalPages}
+                >
+                    Siguiente <span className="icon">→</span> 
+                </button>
+
+            
+            {loading && <p>Cargando...</p>}
+            {mensaje && <p>{mensaje}</p>}
+            {mensaje && !loading && (
+                <div className="alerta-error">
+                    {mensaje}
+                </div>
+            )}
+            </div>
+            
 
             {isAdmin && (
                 <div>
@@ -72,50 +94,52 @@ export default function TodosReclamos() {
             />
             {!busquedaActiva && (
             <div className="buscar-reclamo-activo">
-                <div className="Flechas-reclamos">
-                    <button onClick={() => setPage(page - 1)} disabled={page <= 1}>
-                        <span className="icon">←</span> Volver
-                    </button>
-                    <button onClick={() => setPage(page + 1)} disabled={page >= totalPages}>
-                        <span className="icon">→</span> Siguiente
-                    </button>
-                </div>
+                
             </div>
             )}
             {!busquedaActiva && (
                 <ul className="reclamos-lista">
                     {reclamosOrdenados.map((r) => (
                         <li key={r.id} className="reclamo-card" onDoubleClick={() => setReclamoEditado(r)}>
-                            <strong>{r.categoria}</strong>
-                            <p>{r.descripcion}</p>
-                            <span>Estado: {r.estado}</span>
-                            <p className="fecha">Fecha: {r.soloFecha}</p>
-                            <p className="hora">Hora: {r.soloHora}</p>
+                            {(r.anonimo === true) ? (
+                                <strong>Es Anónimo</strong>
+                            ) : (
+                                <strong>Autor: {r.user ? r.user.nombreCompleto : "No disponible"}</strong>
+                            )}
                             {(!r.anonimo || verAnonimos) ? (
                                 <>
-                                    <p className="hora">Autor: {r.user ? r.user.nombreCompleto : "Anónimo"}</p>
-                                    <p className="hora">Email: {r.user ? r.user.email : "No disponible"}</p>
-                                    <p className="hora">RUT: {r.user ? r.user.rut : "No disponible"}</p>
-                                    <p className="hora">ID reclamo: {r.id}</p>
+                                    <strong> ID reclamo: {r.id}</strong>
+                                    <strong>Autor: {r.user ? r.user.nombreCompleto : "No disponible"}</strong>
+                                    <strong>Categoría: {r.categoria}</strong>
+                                    <span>Descripción: {r.descripcion}</span>
+                                    <span>Estado: {r.estado}</span>
+                                    <strong>Creación del reclamo:</strong>
+                                    <span className="fecha">Fecha: {r.soloFecha}</span>
+                                    <span className="hora">Hora: {r.soloHora}</span>
                                 </>
                             ) : (
                                 <>
-                                    <p className="hora">Autor: Anónimo</p>
-                                    <p className="hora">Email: Anónimo</p>
-                                    <p className="hora">RUT: Anónimo</p>
-                                    <p className="hora">ID reclamo: {r.id}</p>
+                                    <strong> ID reclamo: {r.id}</strong>
+                                    <strong>Categoría: {r.categoria}</strong>
+                                    <span>Descripción: {r.descripcion}</span>
+                                    <span>Estado: {r.estado}</span>
+                                    <strong>Creación del reclamo:</strong>
+                                    <span className="fecha">Fecha: {r.soloFecha}</span>
+                                    <span className="hora">Hora: {r.soloHora}</span>
+
+
                                 </>
                             )}
-                            <p className="hora">Comentarios: {r.comentarioInterno}</p>
-                            <p className="hora">Anonimo: {r.anonimo ? "Sí" : "No"}</p>
+                            <p className="comentario-interno">Comentarios: {r.comentarioInterno}</p>
                         </li>
                     ))}
 
                     {reclamoEditado && (
                         <EditarReclamo
                             reclamo={reclamoEditado}
-                            onClose={() => setReclamoEditado(null)}
+                            onClose={() => { setReclamoEditado(null); setErrorEdicion(""); }}
                             onSave={handleEditarReclamo}
+                            error={errorEdicion}
                         />
                     )}
                 </ul>

@@ -7,9 +7,9 @@ export default function useTodosReclamos() {
     const [mensaje, setMensaje] = useState("");
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-    const limit = 10;
     const [verAnonimos, setVerAnonimos] = useState(false);
     const [ordenDesc, setOrdenDesc] = useState(true);
+    const limit = 5;
 
     async function fetchReclamos() {
         setLoading(true);

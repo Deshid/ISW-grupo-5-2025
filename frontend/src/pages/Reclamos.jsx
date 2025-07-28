@@ -8,53 +8,67 @@ import ReclamosPendientes from "../components/ReclamosPendientes";
 
 
 export default function Reclamos() {
-    const [opcion, setOpcion] = useState(null);
-    const { 
-        isAdmin,
-        isPresidente,
-        isSecretario, 
-        //isTesorero, 
-        isUsuario, 
-        rol
-        } = useUserRole();
-
-        console.log("ROL ACTUAL:", rol, { isUsuario, isSecretario });
+    const { isAdmin, isPresidente, isSecretario, isTesorero, isUsuario } = useUserRole();
+    // Determinar la opción inicial según el rol
+    let opcionInicial = "";
+    if (isUsuario) {
+        opcionInicial = "crear";
+    } else if (isSecretario || isTesorero) {
+        opcionInicial = "reclamos";
+    } else if (isAdmin || isPresidente) {
+        opcionInicial = "todosReclamos";
+    }
+    const [opcion, setOpcion] = useState(opcionInicial);
 
     return (
-    <div className = "containerReclamos">
-
-        <h2>Gestión de Reclamos</h2>
-        <div className = "containerCuerpo">
-            <div className = "containerReclamos-btns">
+        <div className="containerReclamos">
+            <div className="containerCuerpo">
+                <div className="containerReclamos-btns">
                 {isUsuario && (
                     <li>
-                        <button onClick={() => setOpcion("crear")}>Crear Reclamo</button>
+                        <button
+                            className={
+                                opcion === "crear"
+                                    ? "btn-CrearReclamo btn-activo"
+                                    : "btn-CrearReclamo btn-palida"
+                            }
+                            onClick={() => setOpcion("crear")}
+                        >
+                            Crear Reclamo
+                        </button>
                     </li>
                 )}
-                {(isSecretario || isSecretario) && (
-                    <li>
-                        <button onClick={() => setOpcion("reclamos")}>Reclamos</button>
-                    </li>
-                )}
+                    {(isSecretario || isTesorero) && (
+                        <li>
+                            <button className="btn-ReclamosPendientes" onClick={() => setOpcion("reclamos")}>Reclamos Pendientes</button>
+                        </li>
+                    )}
+                    {(isAdmin || isPresidente) && (
+                        <li>
+                            <button className="btn-MostrarReclamos" onClick={() => setOpcion("todosReclamos")}>Mostrar Reclamos</button>
+                        </li>
+                    )}
+                    {isUsuario && (
+                        <li>
+                            <button
+                                className={
+                                    opcion === "misReclamos"
+                                        ? "btn-MisReclamos btn-activo"
+                                        : "btn-MisReclamos btn-palida"
+                                }
+                                onClick={() => setOpcion("misReclamos")}
+                            >
+                                Mis Reclamos
+                            </button>
+                        </li>
+                    )}
+                </div>
 
-                {(isAdmin || isPresidente) && (
-                    <li>
-                        <button onClick={() => setOpcion("todosReclamos")}>Mostrar Reclamos</button>
-                    </li>
-                )}
-
-                {isUsuario && (
-                    <li>
-                        <button onClick={() => setOpcion("misReclamos")}>Mis Reclamos</button>
-                    </li>
-                )}
+                {opcion === "crear" && <div className="formularioReclamo"><ReclamoForm /></div>}
+                {opcion === "reclamos" && <div className="formularioReclamo"><ReclamosPendientes /></div>}
+                {opcion === "misReclamos" && <div className="formularioReclamo"><MisReclamos /></div>}
+                {opcion === "todosReclamos" && <div className="formularioReclamo"><TodosReclamos /></div>}
             </div>
-
-        {opcion === "crear" && <div className="formularioReclamo"><ReclamoForm /></div>}
-        {opcion === "reclamos" && <div className="formularioReclamo"><ReclamosPendientes /></div>}
-        {opcion === "misReclamos" && <div className="formularioReclamo"><MisReclamos /></div>}
-        {opcion === "todosReclamos" && <div className="formularioReclamo"><TodosReclamos/></div>}
         </div>
-    </div>
     );
 }

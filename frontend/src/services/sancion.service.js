@@ -30,7 +30,6 @@ export async function obtenerSanciones() {
 }
 
 // Obtener sanciones activas
-
 export async function getSancionesActivas() {
     const { data } = await axios.get('/usuarios/activas');
     // El backend retorna { sanciones: [...] }

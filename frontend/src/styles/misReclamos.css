@@ -6,26 +6,68 @@
     gap: 1rem;
 }
 
+.flechas-reclamos button {
+    background: #119970;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 18px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.flechas-reclamos button:hover {
+    background: #0e7d5f;
+    transform: scale(1.02);
+}
+
+.flechas-reclamos button:disabled {
+    background: #bdbdbd;
+    color: #fff;
+    cursor: not-allowed;
+    transition: none;
+    transform: none;
+    opacity: 0.7;
+}
+
+.formularioReclamo div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.reclamos-lista {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}   
+
 .reclamo-card {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 220px;
-    background: #fff;
-    border: 1px solid #d1d1d1;
-    border-radius: 8px;
-    box-shadow: 0 2px 50px rgba(0,0,0,0.07);
-    padding: 1rem;
+    background: #f4ffed;
+    border: 1.5px solid #bdbdbd;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 1.2rem;
     min-width: 220px;
-    max-width: 300px;
+    max-width: 320px;
     gap: 0.5rem;
+    color: #2e4c48;
+    font-family: 'Arial', sans-serif;
 }
 
 .reclamo-card:hover {
-    border-color: #007bff;
-    background-color: #f1dada;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #119970;
+    background-color: #e6f9e6;
+    box-shadow: 0 6px 24px rgba(17,153,112,0.08);
 }
 
 .eliminar-icon {
@@ -33,32 +75,40 @@
     height: 24px;
 }
 
+
 .eliminar-btn {
     display: flex;
     align-self: flex-end;
-    background: none;
+    background: #bdbdbd;
     border: none;
+    border-radius: 10px;
     cursor: pointer;
-    padding: 0;
+    padding: 4px 10px;
     margin-bottom: 4px;
+    color: #fff;
+    font-weight: bold;
+    background-color: #757575;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-.eliminar-btn:hover img {
-    filter: brightness(0.7) drop-shadow(0 0 2px #d33);
-    transition: filter 0.2s;
+.eliminar-btn:hover {
+    background-color: #ff0000;
+    transform: scale(1.05);
 }
 
 .hora {
     margin: 0;
 }
 
+
 .alerta-error {
-    background: #ffe0e0;
-    color: #b30000;
-    border: 1px solid #ffb3b3;
+    background: #ffe082;
+    color: #7a5a00;
+    border: 1px solid #ffe082;
     padding: 10px 16px;
-    border-radius: 6px;
+    border-radius: 16px;
     margin-bottom: 16px;
     font-weight: bold;
     text-align: center;
+    box-shadow: 0 2px 8px rgba(255, 215, 64, 0.12);
 }
