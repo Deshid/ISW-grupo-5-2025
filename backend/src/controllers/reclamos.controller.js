@@ -14,7 +14,6 @@ import { sendMail } from "../helpers/email.helper.js";
 export async function crearReclamo(req, res) {
     try {
         const { descripcion, categoria, anonimo } = req.body;
-
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
 
         const nuevoReclamo = reclamoRepository.create({
@@ -51,17 +50,24 @@ export async function getAllReclamos(req, res) {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
+        const order = req.query.order === "asc" ? "ASC" : "DESC";
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const esAdmin = req.user.rol === "administrador";
         const [reclamos, total] = await reclamoRepository.findAndCount({
             relations: ["user"],
             skip,
-            take: limit
+            take: limit,
+            order: { fecha: order }
         });
         const reclamosFiltrados = reclamos.map(r => {
             const reclamoFormateado = {
                 ...r,
-                fecha: formatoFecha(r.fecha)
+                fecha: formatoFecha(r.fecha),
+                user: r.user ? {
+                    nombreCompleto: r.user.nombreCompleto,
+                    email: r.user.email,
+                    rut: r.user.rut
+                } : null
             };
             if (r.anonimo && !esAdmin) {
                 return { ...reclamoFormateado, user: null };
@@ -85,10 +91,38 @@ export async function getReclamo(req, res) {
         const { id } = req.params;
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const reclamo = await reclamoRepository.findOne({ where: { id: Number(id) }, relations: ["user"] });
+
         if (!reclamo) {
             return handleErrorClient(res, 404, "Reclamo no encontrado");
         }
-        return handleSuccess(res, 200, "Reclamo encontrado", reclamo);
+
+        // Formatear la fecha igual que en getAllReclamos
+        const fechaObj = new Date(reclamo.fecha);
+        const fechaFormateada = fechaObj.toLocaleDateString("es-CL") + ", " + fechaObj.toLocaleTimeString("es-CL");
+
+        // Formatear el usuario igual que en la lista
+        const user = reclamo.user
+            ? {
+                nombreCompleto: reclamo.user.nombreCompleto,
+                email: reclamo.user.email,
+                rut: reclamo.user.rut
+            }
+            : null;
+
+        const reclamoFormateado = {
+            id: reclamo.id,
+            fecha: fechaFormateada,
+            descripcion: reclamo.descripcion,
+            categoria: reclamo.categoria,
+            anonimo: reclamo.anonimo,
+            estado: reclamo.estado,
+            comentarioInterno: reclamo.comentarioInterno,
+            resolucion: reclamo.resolucion,
+            usuarioId: reclamo.usuarioId,
+            user
+        };
+
+        return handleSuccess(res, 200, "Reclamo encontrado", reclamoFormateado);
     } catch (error) {
         handleErrorServer(res, 500, error.message);
     }
@@ -209,22 +243,45 @@ export async function getReclamosPendientes(req, res) {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-        const { id } = req.params;
+        const order = req.query.order === "asc" ? "ASC" : "DESC";
         const reclamoRepository = AppDataSource.getRepository(Reclamo);
         const [reclamos, total] = await reclamoRepository.findAndCount({
             where: [
-            { estado: "pendiente" },
-            { estado: "en_proceso" }
+                { estado: "pendiente" }
             ],
             relations: ["user"],
             skip,
-            take: limit
+            take: limit,
+            order: { fecha: order }
         });
         if (!reclamos || reclamos.length === 0) {
             return handleErrorClient(res, 200, "No hay reclamos pendientes o en proceso", []);
         }
+        const reclamosFormateados = reclamos.map(reclamo => {
+            const fechaObj = new Date(reclamo.fecha);
+            const fechaFormateada = fechaObj.toLocaleDateString("es-CL") + ", " + fechaObj.toLocaleTimeString("es-CL");
+            const user = reclamo.user
+                ? {
+                    nombreCompleto: reclamo.user.nombreCompleto,
+                    email: reclamo.user.email,
+                    rut: reclamo.user.rut
+                }
+                : null;
+            return {
+                id: reclamo.id,
+                fecha: fechaFormateada,
+                descripcion: reclamo.descripcion,
+                categoria: reclamo.categoria,
+                anonimo: reclamo.anonimo,
+                estado: reclamo.estado,
+                comentarioInterno: reclamo.comentarioInterno,
+                resolucion: reclamo.resolucion,
+                usuarioId: reclamo.usuarioId,
+                user
+            };
+        });
         return handleSuccess(res, 200, "Reclamos pendientes encontrados", {
-            reclamos,
+            reclamos: reclamosFormateados,
             page,
             limit,
             total,

@@ -1,0 +1,12 @@
+.buscar-reclamo {
+    margin-bottom: 1rem;
+}
+
+.buscar-reclamo button {
+    margin-left: 0.5rem;
+}
+
+.buscar-reclamo .reclamos-lista {
+    list-style: none;
+    padding: 0;
+}

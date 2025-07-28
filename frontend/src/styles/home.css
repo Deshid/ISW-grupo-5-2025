@@ -1,16 +1,43 @@
-/* Aplica a toda la pantalla */
 .home-container {
-    background-image: url('https://images.wikidexcdn.net/mwuploads/wikidex/8/83/Prado_Herradura.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+    position: relative;
     min-height: 100vh;
     width: 100vw;
     display: flex;
-    justify-content: space-between; /* Distribuye el espacio entre el contenido y las imágenes */
-    align-items: center; /* Alinea los elementos al centro */
-    box-sizing: border-box; /* Incluye el padding en el ancho total */
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: hidden;
 }
+
+.home-container, .login-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('https://static.vecteezy.com/system/resources/previews/002/835/799/large_2x/abstract-geometric-3d-triangles-background-free-vector.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    filter: blur(0px); /* desenfoque por defecto */
+    z-index: 0;
+}
+
+.login-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('https://static.vecteezy.com/system/resources/previews/002/835/799/large_2x/abstract-geometric-3d-triangles-background-free-vector.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    filter: blur(0px); /* desenfoque solo para login */
+    z-index: 0;
+}
+
+.home-content, .home-images {
+    position: relative;
+    z-index: 1;
+}
+
 
 /* Contenedor del texto */
 .home-text-box {
@@ -74,12 +101,13 @@
 
 /* Contenedor para las imágenes del lado derecho */
 .home-images {
-    flex: 1;
-    position: relative;
-    width: 600px;
-    height: 640px;
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
-    margin-left: 40px;
+    z-index: 0;
+    pointer-events: none;
 }
 
 /* Lado derecho - imagen 1*/

@@ -1,8 +1,11 @@
 "use strict";
-import Pago from "../entity/pago.entity.js";
+
 import UserSchema from "../entity/user.entity.js";
 import { AppDataSource } from "../config/configDb.js";
 import PagoSchema from "../entity/pago.entity.js";
+
+// Si más adelante quieres volver a generar el PDF, descomenta esta línea
+// import { generarComprobantePago } from "./pdf.services.js";
 
 export async function createPagoService(data) {
     try {
@@ -13,16 +16,23 @@ export async function createPagoService(data) {
         if (data.rut) {
             user = await userRepository.findOne({ where: { rut: data.rut } });
         } else if (data.departamento) {
-            user = await userRepository.findOne({
-                where: { departamento: data.departamento },
-            });
+            user = await userRepository.findOne({ where: { departamento: data.departamento } });
         }
 
         if (!user) {
-            return [
-                null,
-                "Residente no encontrado con el RUT o Departamento proporcionado.",
-            ];
+            return [null, "Residente no encontrado con el RUT o Departamento proporcionado."];
+        }
+
+        const pagoExistente = await pagoRepository.findOne({
+            where: {
+                mes: data.mes,
+                user: { id: user.id },
+            },
+            relations: ["user"],
+        });
+
+        if (pagoExistente) {
+            return [null, `Ya existe un pago registrado para ${user.nombreCompleto} en el mes de ${data.mes}.`];
         }
 
         const nuevoPago = pagoRepository.create({
@@ -35,12 +45,13 @@ export async function createPagoService(data) {
 
         const pagoGuardado = await pagoRepository.save(nuevoPago);
 
-        return [pagoGuardado, null];
+        return [{ pago: pagoGuardado }, null];
     } catch (error) {
         console.error("Error al crear el pago:", error);
         return [null, "Error interno del servidor"];
     }
 }
+
 
 export async function getPagosService() {
     try {

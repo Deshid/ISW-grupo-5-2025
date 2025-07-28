@@ -2,6 +2,7 @@
 import { sancionarUsuarioServicio } from "../services/sancion.service.js";
 import { suspenderSancionServicio } from "../services/sancion.service.js";
 import { obtenerSancionesServicio } from "../services/sancion.service.js";
+import { obtenerSancionesActivasServicio } from "../services/sancion.service.js";
 
 export async function sancionarUsuario(req, res) {
     try {
@@ -35,6 +36,16 @@ export async function obtenerSanciones(req, res) {
         res.status(200).json({ sanciones });
     } catch (error) {
         console.error("Error al obtener sanciones:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+}
+// obtener sanciones activas
+export async function obtenerSancionesActivas(req, res) {
+    try {
+        const resultado = await obtenerSancionesActivasServicio();
+        res.status(200).json(resultado);
+    } catch (error) {
+        console.error("Error al obtener sanciones activas:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 }

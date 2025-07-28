@@ -1,64 +1,219 @@
+/* Badge para cancelación pendiente */
+.badge-cancelacion-pendiente {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(90deg, #ffe082 60%, #ffd54f 100%);
+    color: #7a5a00;
+    font-weight: bold;
+    border-radius: 16px;
+    padding: 4px 14px 4px 10px;
+    font-size: 0.9em;
+    box-shadow: 0 2px 8px rgba(255, 215, 64, 0.12);
+    margin-top: 6px;
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+    border: 1px solid #ffe082;
+}
+.btn-cancelar-gris {
+    background-color: #888 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 8px 0 !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    width: 100%;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.btn-cerrar:hover {
+    background-color: #119970 !important;
+    transform: scale(1.02);
+}
+.btn-cancelar-gris {
+    background-color: #bdbdbd;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-cancelar-gris:hover {
+    background-color: #757575;
+    transform: scale(1.02);
+}
+.popup-editar-reserva {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(44, 62, 80, 0.35); /* fondo oscuro semitransparente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.popup-editar-content {
+    background-color: #f4ffed;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 10px 18px 14px 18px;
+    max-width: 350px;
+    min-height: 120px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    color: #2e4c48;
+    margin: 0;
+    gap: 10px;
+}
+/* Popup exclusivo para editar reserva */
+.popup-editar-reserva {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(44, 62, 80, 0.35); /* fondo oscuro semitransparente */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.popup-editar-content {
+    border-radius: 18px;
+    padding: 0px 0px;
+    min-width: 320px;
+    max-width: 300px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    background: none;
+}
 /* Fondo general */
 body {
-    background-image: url('https://static.vecteezy.com/system/resources/previews/006/993/472/non_2x/park-landscape-scene-illustration-nature-with-buildings-trees-clouds-and-sky-public-park-with-path-in-urban-vector.jpg');
+    background-image: url('https://i.pinimg.com/736x/1f/41/8e/1f418ed68fd9104ac3c3d48adf2bc379.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
+    backdrop-filter: blur(4px); /* Aplica un desenfoque */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+}
+.mis-reservas-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 15px 0px;
+    background-color: #f4ffed;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 800px;
+    max-height: 700px;
+    overflow: visible;
+    margin: 0 auto;
+    padding-bottom: 0%;
+    box-sizing: border-box;
+    position: relative;
+    overflow-y: auto; /* Permite el scroll vertical */
+}
+
+.mis-reservas-container h3 {
+    grid-column: 1 / -1; /* Ocupa toda la fila del grid */
+    font-size: 1.2em;
+    color: #2e4c48;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Botón cancelar */
+.notice-item .btn-warning {
+    background: linear-gradient(90deg, #ff9800, #fd5151);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 18px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.08);
+    align-self: flex-end;
+    margin-top: auto;
+}
+
+.no-reservas {
+    font-size: 18px;
+    color: #4f92a7;
+    text-align: center;
+    margin: 20px 0;
+    width: 100%;
+    display: block;
+    margin-top: auto;
+    grid-column: 1 / -1;
+}
+
+/* Contenedor principal */
+.main-container-reserva {
+    display: flex; 
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px; 
+    padding: 20px; 
+    flex-wrap: wrap; 
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 40px; 
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
 }
 
 /* Contenedor del formulario */
 .form-reserva {
     font-family: 'Arial', sans-serif;
     color: #2e4c48;
-    background-color: #fae3b8;
+    background-color: #f4ffed;
     padding: 40px 30px;
     border-radius: 18px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 400px;
-    margin: 40px auto;
+    max-width: 400px; 
+    width: 100%; 
+    margin: 0; 
     gap: 18px;
 }
 
-/* Labels */
-.form-reserva label {
-    font-weight: 600;
-    margin-bottom: 6px;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    color: #2e4c48;
-}
-
-/* Inputs y selects */
-.form-reserva input,
-.form-reserva select {
-    border: 2px solid #ca8f7d;
-    border-radius: 10px;
-    padding: 8px 10px;
-    font-size: 16px;
-    background-color: #ffffff;
-    color: #2e4c48;
-    margin-top: 4px;
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
-    transition: border-color 0.2s, background-color 0.2s;
-}
-
-.form-reserva input:focus,
-.form-reserva select:focus {
-    outline: none;
-    border-color: #607396;
-    background-color: #f3f0de;
-}   
-
-/* Botón */
+/* Botón general para reservar en el formulario */
 .form-reserva button {
-    background-color: #119970;
+    background-color: #119970; /* boton reservar */
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -79,14 +234,157 @@ body {
 .form-reserva .mensaje {
     margin-top: 10px;
     font-size: 15px;
-    color: #5a7d5a;
+    color: #4f92a7;
     text-align: center;
 }
 
+/* Labels */
+.form-reserva label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: #2e4c48;
+}
+
+/* Inputs y selects */
+.form-reserva input,
+.form-reserva select {
+    border: 2px solid #b3bce7;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 16px;
+    background-color: #ffffff;
+    color: #2e4c48;
+    margin-top: 4px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-reserva input:focus,
+.form-reserva select:focus {
+    outline: none;
+    border-color: #5172af;
+    background-color: #f3f4ff;
+}   
+
+.mis-reservas-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.mis-reservas-container::-webkit-scrollbar-track {
+    background: #f4ffed;
+    border-radius: 10px;
+}
+
+.mis-reservas-container::-webkit-scrollbar-thumb {
+    background-color: #119970;
+    border-radius: 10px;
+    border: 2px solid #f4ffed;
+}
+
+
+.notice-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 5px;
+    margin-bottom: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    width: 95%;
+}
+
+.notice-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background-color: #3cd1ca;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.notice-item h4 {
+    font-size: 1.05em;
+    color: #333;
+    margin-bottom: -10px;
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+.notice-item p {
+    font-size: 0.95em;
+    color: #555;
+    line-height: 1.4;
+    padding-left: 10px;
+    margin-bottom: 8px;
+}
+
+
+.notice-item .btn-warning:hover {
+    background: linear-gradient(90deg, #b700ff, #8793ff); 
+    transform: scale(1.05);
+}
+
+.estado-pendiente {
+    background: #fff7c2;
+    color: #b48a00;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 5px; 
+}
+.estado-aprobada {
+    background: #d4f7dc;
+    color: #119970;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 5px; 
+}
+
+.estado-rechazada {
+    background: #fdd6d6;
+    color: #e74c3c;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 5px; 
+}
+.estado-cancelada {
+    background: #ffd6d6;
+    color: #e74c3c;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-bottom: 5px; 
+}
+
 /* Responsive (adaptación a diferentes tamaños de pantalla) */
-@media (max-width: 600px) {
-    .form-reserva {
-        padding: 20px 10px;
-        max-width: 95vw;
+@media (max-width: 850px) { 
+    .main-container {
+        flex-direction: column; 
+        align-items: center;
+        gap: 30px;
+    }
+
+    .form-reserva,
+    .mis-reservas-container {
+        padding: 20px 15px;
+        max-width: 95vw; 
+        width: 100%;
+        margin: 0; 
     }
 }
