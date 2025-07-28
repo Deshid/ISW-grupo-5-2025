@@ -1,13 +1,14 @@
-  import '../styles/home.css';
+import '../styles/home.css';
 
-  const Home = () => {
+const Home = () => {
   return (
     <main className="home-container">
+      {/* Aquí puedes dejar solo una portada, imagen o mensaje de bienvenida si lo deseas */}
       <div className="home-content">
         <div className="home-text-box">
           <div className="home-text-bg-auto">
-            <h1 className="home-title">Condominios</h1>
-            <h2 className="home-subtitle">Grupo 5</h2>
+            <h1 className="home-title">Bienvenido</h1>
+            <h2 className="home-subtitle">condominio</h2>
           </div>
         </div>
       </div>
@@ -17,6 +18,6 @@
       </div>
     </main>
   );
-  };
+};
 
-  export default Home;
+export default Home;
