@@ -196,13 +196,14 @@ export const updateEstadoReclamoValidation = Joi.object({
             "string.empty": "El estado es obligatorio.",
             "any.required": "El estado es obligatorio."
         }),
-        comentarioInterno: Joi.string()
+    comentarioInterno: Joi.string()
         .trim()
         .min(3)
         .max(500)
         .optional()
         .messages({
             "string.base": "El comentario debe ser un texto.",
+            "string.empty": "El comentario no puede estar vacío.",
             "string.min": "El comentario debe tener al menos 3 caracteres.",
             "string.max": "El comentario no puede superar los 500 caracteres."
         })
