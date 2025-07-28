@@ -8,9 +8,11 @@ import Register from '@pages/Register';
 import Error404 from '@pages/Error404';
 import Root from '@pages/Root';
 import ProtectedRoute from '@components/ProtectedRoute';
-import Pagos from '@pages/Pagos';
+import Pagos from '@pages/pagos';
 
 import '@styles/styles.css';
+
+import Reservas from '@pages/Reservas';
 
 import ReservasAdmin from '@pages/ReservasAdmin';
 
@@ -39,7 +41,14 @@ const router = createBrowserRouter([
       {  
         path: '/reservas',
         element: <Reservas/>
-  },
+  },{
+        path: '/pagos',
+        element: (
+          <ProtectedRoute allowedRoles={['tesorero']}>
+            <Pagos />
+          </ProtectedRoute>
+        )
+      },
     {
       path: '/reservas-admin',
       element: (
