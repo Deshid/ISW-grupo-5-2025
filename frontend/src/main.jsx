@@ -11,7 +11,7 @@ import Reservas from '@pages/Reservas';
 import ProtectedRoute from '@components/ProtectedRoute';
 
 import '@styles/styles.css';
-import Reservas from '@pages/Reservas';
+
 import ReservasAdmin from '@pages/ReservasAdmin';
 
 const router = createBrowserRouter([
